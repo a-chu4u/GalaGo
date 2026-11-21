@@ -1,0 +1,423 @@
+[
+{
+  "model": "tourism.category",
+  "pk": 1,
+  "fields": {
+    "name": "Beach",
+    "description": ""
+  }
+},
+{
+  "model": "tourism.category",
+  "pk": 2,
+  "fields": {
+    "name": "Lagoon",
+    "description": ""
+  }
+},
+{
+  "model": "tourism.category",
+  "pk": 3,
+  "fields": {
+    "name": "Lake",
+    "description": ""
+  }
+},
+{
+  "model": "tourism.category",
+  "pk": 4,
+  "fields": {
+    "name": "Island",
+    "description": ""
+  }
+},
+{
+  "model": "tourism.category",
+  "pk": 5,
+  "fields": {
+    "name": "Nature",
+    "description": ""
+  }
+},
+{
+  "model": "tourism.location",
+  "pk": 1,
+  "fields": {
+    "name": "El Nido",
+    "address": "El Nido, Palawan, Philippines",
+    "latitude": "11.1790000",
+    "longitude": "119.3900000"
+  }
+},
+{
+  "model": "tourism.location",
+  "pk": 2,
+  "fields": {
+    "name": "Big Lagoon",
+    "address": "Miniloc Island, El Nido, Palawan, Philippines",
+    "latitude": "11.1547000",
+    "longitude": "119.3209000"
+  }
+},
+{
+  "model": "tourism.location",
+  "pk": 3,
+  "fields": {
+    "name": "Small Lagoon",
+    "address": "Miniloc Island, El Nido, Palawan, Philippines",
+    "latitude": "11.1567000",
+    "longitude": "119.3210000"
+  }
+},
+{
+  "model": "tourism.location",
+  "pk": 4,
+  "fields": {
+    "name": "Nacpan Beach",
+    "address": "Barangay Bucana, El Nido, Palawan, Philippines",
+    "latitude": "11.3221000",
+    "longitude": "119.4284000"
+  }
+},
+{
+  "model": "tourism.location",
+  "pk": 5,
+  "fields": {
+    "name": "Seven Commandos Beach",
+    "address": "Bacuit Bay, El Nido, Palawan, Philippines",
+    "latitude": "11.1737000",
+    "longitude": "119.3769000"
+  }
+},
+{
+  "model": "tourism.location",
+  "pk": 6,
+  "fields": {
+    "name": "Kayangan Lake",
+    "address": "Coron Island, Coron, Palawan, Philippines",
+    "latitude": "11.9540000",
+    "longitude": "120.2241000"
+  }
+},
+{
+  "model": "tourism.location",
+  "pk": 7,
+  "fields": {
+    "name": "Twin Lagoon",
+    "address": "Coron Island, Coron, Palawan, Philippines",
+    "latitude": "11.9478000",
+    "longitude": "120.2096000"
+  }
+},
+{
+  "model": "tourism.location",
+  "pk": 8,
+  "fields": {
+    "name": "Barracuda Lake",
+    "address": "Coron Island, Coron, Palawan, Philippines",
+    "latitude": "11.9528000",
+    "longitude": "120.2172000"
+  }
+},
+{
+  "model": "tourism.location",
+  "pk": 9,
+  "fields": {
+    "name": "Malcapuya Island",
+    "address": "Culion, Palawan, Philippines",
+    "latitude": "11.7850000",
+    "longitude": "120.1270000"
+  }
+},
+{
+  "model": "tourism.location",
+  "pk": 10,
+  "fields": {
+    "name": "Honda Bay",
+    "address": "Honda Bay, Puerto Princesa City, Palawan, Philippines",
+    "latitude": "9.9000000",
+    "longitude": "118.8000000"
+  }
+},
+{
+  "model": "tourism.location",
+  "pk": 11,
+  "fields": {
+    "name": "Puerto Princesa Underground River",
+    "address": "Barangay Cabayugan, Puerto Princesa City, Palawan, Philippines",
+    "latitude": "10.1929000",
+    "longitude": "118.9265000"
+  }
+},
+{
+  "model": "tourism.location",
+  "pk": 12,
+  "fields": {
+    "name": "Long Beach",
+    "address": "San Vicente, Palawan, Philippines",
+    "latitude": "10.5320000",
+    "longitude": "119.2700000"
+  }
+},
+{
+  "model": "tourism.location",
+  "pk": 13,
+  "fields": {
+    "name": "Port Barton",
+    "address": "Barangay Port Barton, San Vicente, Palawan, Philippines",
+    "latitude": "10.4135000",
+    "longitude": "119.1780000"
+  }
+},
+{
+  "model": "tourism.touristspot",
+  "pk": 1,
+  "fields": {
+    "name": "El Nido Beach",
+    "description": "El Nido is a beautiful tourist destination in Palawan, Philippines, known for its crystal-clear waters, white-sand beaches, stunning limestone cliffs, and hidden lagoons. It is a perfect place for island hopping, snorkeling, kayaking, and enjoying nature.",
+    "category": 1,
+    "location": 1,
+    "image": "tourist_spots/El_NIdo.png",
+    "created_at": "2026-11-21T04:33:02.973Z"
+  }
+},
+{
+  "model": "tourism.touristspot",
+  "pk": 2,
+  "fields": {
+    "name": "Big Lagoon",
+    "description": "Big Lagoon is a scenic attraction on Miniloc Island in El Nido, Palawan. It is known for its turquoise waters, towering limestone cliffs, and peaceful natural surroundings. Visitors can explore the lagoon by kayak, enjoy sightseeing, and take photographs of the beautiful rock formations.",
+    "category": 2,
+    "location": 2,
+    "image": "tourist_spots/Big_Lagoon.jpg",
+    "created_at": "2026-11-21T04:44:17.420Z"
+  }
+},
+{
+  "model": "tourism.touristspot",
+  "pk": 3,
+  "fields": {
+    "name": "Kayangan Lake",
+    "description": "Kayangan Lake is one of the most famous tourist attractions in Coron, Palawan. Surrounded by dramatic limestone cliffs and lush greenery, the lake is known for its exceptionally clear waters and picturesque scenery. Visitors can climb a short trail to reach a famous viewpoint overlooking the surrounding landscape before descending to the lake. Swimming, sightseeing, and photography are popular activities at this beautiful natural destination.",
+    "category": 3,
+    "location": 6,
+    "image": "tourist_spots/Kayangan_Lake.jpg",
+    "created_at": "2026-11-21T05:03:59.662Z"
+  }
+},
+{
+  "model": "tourism.touristspot",
+  "pk": 4,
+  "fields": {
+    "name": "Twin Lagoon",
+    "description": "Twin Lagoon is a breathtaking natural attraction located on Coron Island in Palawan. It consists of two connected lagoons surrounded by towering limestone cliffs and beautiful turquoise waters. Visitors can explore the lagoons through guided boat tours and enjoy swimming, sightseeing, and photography. The connection between the lagoons can be accessed differently depending on the tide and local conditions, making the experience unique.",
+    "category": 2,
+    "location": 7,
+    "image": "tourist_spots/Twin_Lagoon.jpg",
+    "created_at": "2026-11-21T05:05:05.774Z"
+  }
+},
+{
+  "model": "tourism.touristspot",
+  "pk": 5,
+  "fields": {
+    "name": "Small Lagoon",
+    "description": "Small Lagoon is a hidden natural paradise located on Miniloc Island in El Nido, Palawan. Surrounded by towering limestone cliffs, it features calm, clear waters and a narrow entrance that visitors can explore by kayak. The lagoon offers beautiful scenery, peaceful surroundings, and opportunities for sightseeing and photography. It is a popular destination for travelers who enjoy nature and outdoor adventures.",
+    "category": 2,
+    "location": 3,
+    "image": "tourist_spots/Small_Lagoon.jpg",
+    "created_at": "2026-11-21T05:06:00.417Z"
+  }
+},
+{
+  "model": "tourism.touristspot",
+  "pk": 6,
+  "fields": {
+    "name": "Nacpan Beach",
+    "description": "Nacpan Beach is a stunning stretch of golden sand located approximately 45 minutes to one hour from El Nido town. Known for its long coastline, coconut trees, and beautiful blue waters, the beach provides a relaxing escape from crowded tourist areas. Visitors can enjoy walking along the shore, swimming when conditions are safe, watching sunsets, and taking photographs of the scenic surroundings.",
+    "category": 1,
+    "location": 4,
+    "image": "tourist_spots/Nacpan_Beach.jpg",
+    "created_at": "2026-11-21T05:08:53.164Z"
+  }
+},
+{
+  "model": "tourism.touristspot",
+  "pk": 7,
+  "fields": {
+    "name": "Seven Commandos Beach",
+    "description": "Seven Commandos Beach is a popular tropical destination in El Nido, Palawan. It is known for its soft white sand, crystal-clear waters, and coconut trees lining the shoreline. Commonly included in island-hopping tours, the beach offers opportunities for swimming, snorkeling, photography, and relaxation. Its natural beauty and peaceful tropical atmosphere make it a favorite stop for visitors exploring Bacuit Bay.",
+    "category": 1,
+    "location": 5,
+    "image": "tourist_spots/Seven_Commandos.png",
+    "created_at": "2026-11-21T05:12:44.553Z"
+  }
+},
+{
+  "model": "tourism.touristspot",
+  "pk": 8,
+  "fields": {
+    "name": "Barracuda Lake",
+    "description": "Barracuda Lake is a unique natural attraction located on Coron Island, Palawan. Known for its clear waters, impressive limestone formations, and unusual underwater temperature layers, the lake attracts both tourists and experienced divers. Visitors can enjoy swimming, sightseeing, and guided diving activities. Its dramatic underwater environment and surrounding scenery make it one of Coron's most distinctive destinations.",
+    "category": 3,
+    "location": 8,
+    "image": "tourist_spots/Barracuda_Lake.jpg",
+    "created_at": "2026-11-21T05:13:58.431Z"
+  }
+},
+{
+  "model": "tourism.touristspot",
+  "pk": 9,
+  "fields": {
+    "name": "Malcapuya Island",
+    "description": "Malcapuya Island is a beautiful tropical island located in Culion, Palawan, and is commonly visited through island-hopping tours from Coron. The island features powdery white sand, clear blue waters, and a peaceful coastal environment. Visitors can enjoy swimming, snorkeling, sunbathing, beach walks, and photography. Its relaxing atmosphere makes it an excellent destination for travelers looking for a quiet island getaway.",
+    "category": 4,
+    "location": 9,
+    "image": "tourist_spots/Malcapuya_Island.jpg",
+    "created_at": "2026-11-21T05:14:51.699Z"
+  }
+},
+{
+  "model": "tourism.touristspot",
+  "pk": 10,
+  "fields": {
+    "name": "Honda Bay",
+    "description": "Honda Bay is a popular coastal destination located near Puerto Princesa City in Palawan. The bay is known for its beautiful islands, sandy beaches, and island-hopping activities. Visitors can explore nearby islands, enjoy swimming and snorkeling in designated areas, and experience the natural beauty of Palawan's coastal environment. Boat tours commonly depart from Sta. Lourdes Wharf, making Honda Bay an accessible destination for tourists staying in Puerto Princesa.",
+    "category": 4,
+    "location": 10,
+    "image": "tourist_spots/Honda_Bay.png",
+    "created_at": "2026-11-21T05:15:58.651Z"
+  }
+},
+{
+  "model": "tourism.touristspot",
+  "pk": 11,
+  "fields": {
+    "name": "Puerto Princesa Underground River",
+    "description": "The Puerto Princesa Underground River is a world-famous natural attraction located within Puerto Princesa Subterranean River National Park in Palawan. Recognized as a UNESCO World Heritage Site, it features an underground river flowing through a remarkable limestone cave system. Visitors can join guided paddleboat tours to explore sections of the cave, observe impressive rock formations, and learn about the protected natural environment. It is one of Palawan's most important ecological and tourism destinations.",
+    "category": 5,
+    "location": 10,
+    "image": "tourist_spots/Underground_River.jpg",
+    "created_at": "2026-11-21T05:16:57.592Z"
+  }
+},
+{
+  "model": "tourism.touristspot",
+  "pk": 12,
+  "fields": {
+    "name": "Long Beach",
+    "description": "Long Beach is an extensive sandy coastline located in San Vicente, Palawan. Known for its wide shoreline, beautiful sunsets, and peaceful surroundings, it offers visitors a relaxing escape from busier tourist destinations. Travelers can enjoy walking along the beach, sightseeing, photography, and spending time surrounded by natural coastal scenery. Its spacious environment and relatively quiet atmosphere make it ideal for visitors seeking relaxation.",
+    "category": 1,
+    "location": 12,
+    "image": "tourist_spots/Long_Beach.jpg",
+    "created_at": "2026-11-21T05:18:17.711Z"
+  }
+},
+{
+  "model": "tourism.touristspot",
+  "pk": 13,
+  "fields": {
+    "name": "Port Barton",
+    "description": "Port Barton is a peaceful coastal village located in San Vicente, Palawan. Known for its beautiful beaches, laid-back atmosphere, and nearby islands, it offers a relaxing destination for travelers who enjoy nature and outdoor activities. Visitors can experience island-hopping tours, snorkeling, swimming, sunset viewing, and exploring the surrounding coastal environment. Port Barton is especially popular among tourists looking for a quieter alternative to larger tourism centers.",
+    "category": 1,
+    "location": 13,
+    "image": "tourist_spots/Port_barton.jpg",
+    "created_at": "2026-11-21T05:19:10.440Z"
+  }
+},
+{
+  "model": "tourism.visitor",
+  "pk": 1,
+  "fields": {
+    "name": "Loki",
+    "email": "loki@gmail.com"
+  }
+},
+{
+  "model": "tourism.visitor",
+  "pk": 2,
+  "fields": {
+    "name": "Noir",
+    "email": "noir@gmail.com"
+  }
+},
+{
+  "model": "tourism.visitor",
+  "pk": 3,
+  "fields": {
+    "name": "Toffee",
+    "email": "toffe@gmail.com"
+  }
+},
+{
+  "model": "tourism.visitor",
+  "pk": 4,
+  "fields": {
+    "name": "Mallows",
+    "email": "mallowieee@gmail.com"
+  }
+},
+{
+  "model": "tourism.visitor",
+  "pk": 5,
+  "fields": {
+    "name": "meow",
+    "email": "meowwy@gmail.com"
+  }
+},
+{
+  "model": "tourism.review",
+  "pk": 1,
+  "fields": {
+    "tourist_spot": 1,
+    "visitor": 1,
+    "rating": 4,
+    "comment": "I love the view!!!",
+    "created_at": "2026-11-21T06:29:35.751Z"
+  }
+},
+{
+  "model": "tourism.review",
+  "pk": 2,
+  "fields": {
+    "tourist_spot": 1,
+    "visitor": 2,
+    "rating": 5,
+    "comment": "I love the place!! Staffs we're really assistive <3",
+    "created_at": "2026-11-21T06:37:06.193Z"
+  }
+},
+{
+  "model": "tourism.review",
+  "pk": 3,
+  "fields": {
+    "tourist_spot": 1,
+    "visitor": 3,
+    "rating": 5,
+    "comment": "YASSS!",
+    "created_at": "2026-11-21T06:38:30.983Z"
+  }
+},
+{
+  "model": "tourism.review",
+  "pk": 4,
+  "fields": {
+    "tourist_spot": 1,
+    "visitor": 4,
+    "rating": 5,
+    "comment": "Love it!",
+    "created_at": "2026-11-21T06:39:53.095Z"
+  }
+},
+{
+  "model": "tourism.review",
+  "pk": 5,
+  "fields": {
+    "tourist_spot": 12,
+    "visitor": 5,
+    "rating": 5,
+    "comment": "",
+    "created_at": "2026-11-21T06:49:26.257Z"
+  }
+}
+]
