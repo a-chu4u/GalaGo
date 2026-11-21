@@ -1,0 +1,139 @@
+
+{% extends "base.html" %}
+
+{% block title %}{{ spot.name }} | GalaGo{% endblock %}
+
+{% block content %}
+
+<section class="detail-page">
+    <div class="container">
+
+        <a href="{% url 'home' %}" class="back-link">
+            ← Back to Explore
+        </a>
+
+        <div class="detail-heading">
+            <span class="eyebrow">
+                {{ spot.category.name }}
+            </span>
+
+            <h1>{{ spot.name }}</h1>
+
+            <p>
+                📍 {{ spot.location.address }}
+            </p>
+        </div>
+
+        <div class="detail-image">
+            {% if spot.image %}
+                <img
+                    src="{{ spot.image.url }}"
+                    alt="{{ spot.name }}"
+                >
+            {% else %}
+                <div class="image-placeholder">
+                    <span>🌴</span>
+                    <small>Explore Palawan</small>
+                </div>
+            {% endif %}
+        </div>
+
+        <div class="detail-grid">
+            <div class="detail-main">
+                <h2>About this destination</h2>
+
+                <p class="detail-description">
+                    {{ spot.description }}
+                </p>
+
+                <h2>Where to find it</h2>
+
+                <p>{{ spot.location.address }}</p>
+
+                <div class="coordinates">
+                    <div>
+                        <small>Latitude</small>
+                        <strong>
+                            {{ spot.location.latitude }}
+                        </strong>
+                    </div>
+
+                    <div>
+                        <small>Longitude</small>
+                        <strong>
+                            {{ spot.location.longitude }}
+                        </strong>
+                    </div>
+                </div>
+
+                <div class="map-placeholder">
+                    <span>📍</span>
+                    <h3>Interactive Map</h3>
+                    <p>
+                        Leaflet and OpenStreetMap
+                        integration will be added
+                        in the next development steps.
+                    </p>
+                </div>
+            </div>
+
+            <aside class="detail-sidebar">
+                <span class="eyebrow">
+                    DESTINATION OVERVIEW
+                </span>
+
+                <div class="overview-row">
+                    <span>Category</span>
+                    <strong>{{ spot.category.name }}</strong>
+                </div>
+
+                <div class="overview-row">
+                    <span>Location</span>
+                    <strong>{{ spot.location.name }}</strong>
+                </div>
+
+                <div class="overview-row">
+                    <span>Average Rating</span>
+                    <strong>
+                        {% if average_rating %}
+                            ⭐ {{ average_rating|floatformat:1 }}/5
+                        {% else %}
+                            No ratings yet
+                        {% endif %}
+                    </strong>
+                </div>
+
+                <div class="overview-row">
+                    <span>Reviews</span>
+                    <strong>{{ reviews.count }}</strong>
+                </div>
+            </aside>
+        </div>
+
+        <div class="reviews-section">
+            <span class="eyebrow">
+                TRAVELER EXPERIENCES
+            </span>
+
+            <h2>Visitor Reviews</h2>
+
+            {% for review in reviews %}
+                <div class="review-card">
+                    <div class="review-top">
+                        <strong>{{ review.visitor.name }}</strong>
+                        <span>⭐ {{ review.rating }}/5</span>
+                    </div>
+
+                    <p>{{ review.comment }}</p>
+                </div>
+            {% empty %}
+                <p class="no-reviews">
+                    No reviews yet for this destination.
+                </p>
+            {% endfor %}
+        </div>
+
+    </div>
+</section>
+
+{% endblock %}

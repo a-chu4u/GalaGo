@@ -1,0 +1,180 @@
+
+{% extends "base.html" %}
+
+{% block title %}Explore Palawan | GalaGo{% endblock %}
+
+{% block content %}
+
+<section class="hero">
+    <div class="container hero-content">
+        <div class="hero-copy">
+            <span class="hero-eyebrow">
+                ✦ YOUR PALAWAN TRAVEL COMPANION
+            </span>
+
+            <h1>
+                Find your next
+                <em>beautiful escape.</em>
+            </h1>
+
+            <p>
+                From hidden lagoons to breathtaking
+                beaches, discover the best places
+                Palawan has to offer.
+            </p>
+
+            <a href="#destinations" class="hero-button">
+                Explore Destinations
+                <span>↗</span>
+            </a>
+        </div>
+    </div>
+</section>
+
+<section class="explore" id="destinations">
+    <div class="container">
+
+        <div class="section-top">
+            <div>
+                <span class="eyebrow">
+                    THE ADVENTURE STARTS HERE
+                </span>
+
+                <h2>Discover Palawan</h2>
+
+                <p>
+                    Beautiful places waiting to be explored.
+                </p>
+            </div>
+
+            <span class="spot-count">
+                {{ spot_count }} destinations
+            </span>
+        </div>
+
+        <form
+            method="GET"
+            action="{% url 'home' %}"
+            class="search-box"
+        >
+            <span class="search-icon">⌕</span>
+
+            <input
+                type="text"
+                name="q"
+                value="{{ query }}"
+                placeholder="Search beaches, lagoons, islands..."
+            >
+
+            {% if selected_category %}
+                <input
+                    type="hidden"
+                    name="category"
+                    value="{{ selected_category }}"
+                >
+            {% endif %}
+
+            <button type="submit">Search</button>
+        </form>
+
+        <div class="category-row">
+            <a
+                href="{% url 'home' %}#destinations"
+                class="category-chip {% if not selected_category %}selected{% endif %}"
+            >
+                All Places
+            </a>
+
+            {% for category in categories %}
+                <a
+                    href="?category={{ category.pk }}#destinations"
+                    class="category-chip {% if selected_category == category.pk|stringformat:'s' %}selected{% endif %}"
+                >
+                    {{ category.name }}
+                </a>
+            {% endfor %}
+        </div>
+
+        <div class="results-heading">
+            <h3>Places to explore</h3>
+
+            <span>
+                {{ spots|length }} results
+            </span>
+        </div>
+
+        <div class="destination-grid">
+
+            {% for spot in spots %}
+
+                <a
+                    href="{% url 'spot_detail' spot.pk %}"
+                    class="destination-card"
+                >
+                    <div class="card-image">
+                        {% if spot.image %}
+                            <img
+                                src="{{ spot.image.url }}"
+                                alt="{{ spot.name }}"
+                                loading="lazy"
+                            >
+                        {% else %}
+                            <div class="image-placeholder">
+                                <span>🌴</span>
+                                <small>Discover Palawan</small>
+                            </div>
+                        {% endif %}
+
+                        <span class="card-category">
+                            {{ spot.category.name }}
+                        </span>
+                    </div>
+
+                    <div class="card-body">
+                        <div class="card-location">
+                            📍 {{ spot.location.name }}
+                        </div>
+
+                        <h3>{{ spot.name }}</h3>
+
+                        <p>
+                            {{ spot.description|truncatewords:20 }}
+                        </p>
+
+                        <div class="card-bottom">
+                            <span>View destination</span>
+                            <span class="arrow-circle">↗</span>
+                        </div>
+                    </div>
+                </a>
+
+            {% empty %}
+
+                <div class="empty-state">
+                    <span>🌿</span>
+                    <h3>No destinations found</h3>
+                    <p>
+                        Try another search or add tourist
+                        spots through Django Admin.
+                    </p>
+                </div>
+
+            {% endfor %}
+
+        </div>
+    </div>
+</section>
+
+<section class="closing-banner">
+    <div class="container">
+        <span>YOUR NEXT ADVENTURE AWAITS</span>
+        <h2>There's more to discover.</h2>
+        <p>
+            Explore the natural beauty of Palawan,
+            one destination at a time.
+        </p>
+        <a href="#destinations">Find your escape ↗</a>
+    </div>
+</section>
+
+{% endblock %}
