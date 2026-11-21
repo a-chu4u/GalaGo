@@ -6,8 +6,13 @@ Django settings for galagoproject project.
 import os
 from pathlib import Path
 
+from dotenv import load_dotenv
+
+
+
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+load_dotenv(BASE_DIR / ".env")
 # Development settings
 # Set DJANGO_SECRET_KEY in your environment.
 SECRET_KEY = os.environ.get(

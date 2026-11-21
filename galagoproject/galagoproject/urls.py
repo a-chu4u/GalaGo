@@ -8,14 +8,30 @@ from tourism import views
 
 
 urlpatterns = [
-    path("admin/", admin.site.urls),
-    path("", views.home, name="home"),
+    path(
+        "admin/",
+        admin.site.urls,
+    ),
+
+    path(
+        "",
+        views.home,
+        name="home",
+    ),
+
     path(
         "spots/<int:pk>/",
         views.spot_detail,
         name="spot_detail",
     ),
+
+    path(
+        "spots/<int:pk>/route/",
+        views.calculate_route,
+        name="calculate_route",
+    ),
 ]
+
 
 if settings.DEBUG:
     urlpatterns += static(

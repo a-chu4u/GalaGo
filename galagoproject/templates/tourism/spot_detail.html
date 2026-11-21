@@ -8,10 +8,12 @@
 <section class="detail-page">
     <div class="container">
 
+        <!-- BACK BUTTON -->
         <a href="{% url 'home' %}" class="back-link">
             ← Back to Explore
         </a>
 
+        <!-- DESTINATION HEADER -->
         <div class="detail-heading">
             <span class="eyebrow">
                 {{ spot.category.name }}
@@ -22,6 +24,7 @@
             <p>📍 {{ spot.location.address }}</p>
         </div>
 
+        <!-- DESTINATION IMAGE -->
         <div class="detail-image">
             {% if spot.image %}
                 <img
@@ -36,26 +39,34 @@
             {% endif %}
         </div>
 
+        <!-- DESTINATION CONTENT -->
         <div class="detail-grid">
+
             <div class="detail-main">
 
+                <!-- DESCRIPTION -->
                 <h2>About this destination</h2>
 
                 <p class="detail-description">
                     {{ spot.description }}
                 </p>
 
+                <!-- WEATHER -->
                 <h2>Current Weather</h2>
 
                 <div class="weather-card">
+
                     {% if weather %}
+
                         <div class="weather-heading">
                             <div>
                                 <span class="eyebrow">
                                     LIVE WEATHER DATA
                                 </span>
 
-                                <h3>{{ weather.description }}</h3>
+                                <h3>
+                                    {{ weather.description }}
+                                </h3>
                             </div>
 
                             <div class="weather-temperature">
@@ -64,6 +75,7 @@
                         </div>
 
                         <div class="weather-grid">
+
                             <div>
                                 <small>Feels Like</small>
                                 <strong>
@@ -91,6 +103,7 @@
                                     {{ weather.precipitation }} mm
                                 </strong>
                             </div>
+
                         </div>
 
                         <p class="weather-note">
@@ -98,39 +111,131 @@
                             Updated: {{ weather.updated_at }}
                             (Philippine time)
                         </p>
+
                     {% else %}
+
                         <p class="weather-unavailable">
                             Weather information is temporarily unavailable.
                             Please try again later.
                         </p>
+
                     {% endif %}
+
                 </div>
 
+                <!-- LOCATION -->
                 <h2>Where to find it</h2>
 
                 <p>{{ spot.location.address }}</p>
 
                 <div class="coordinates">
+
                     <div>
                         <small>Latitude</small>
-                        <strong>{{ spot.location.latitude }}</strong>
+                        <strong>
+                            {{ spot.location.latitude }}
+                        </strong>
                     </div>
 
                     <div>
                         <small>Longitude</small>
-                        <strong>{{ spot.location.longitude }}</strong>
+                        <strong>
+                            {{ spot.location.longitude }}
+                        </strong>
                     </div>
+
                 </div>
 
+                <!-- MAP -->
                 <div class="map-section">
+
                     <h3>Explore on the map</h3>
 
                     <p>
-                        Find this destination and explore
-                        the surrounding area.
+                        View this destination and calculate
+                        a driving route from your selected
+                        starting location.
                     </p>
 
                     <div id="destination-map"></div>
+
+                    <!-- ROUTE PLANNER -->
+                    <div class="route-panel">
+
+                        <span class="eyebrow">
+                            PLAN YOUR ROUTE
+                        </span>
+
+                        <h3>Find a driving route</h3>
+
+                        <p>
+                            Click anywhere on the map to
+                            choose your starting location.
+                            Then click Find Route.
+                        </p>
+
+                        <div class="route-start">
+                            <small>Starting Location</small>
+
+                            <strong id="start-location">
+                                Not selected
+                            </strong>
+                        </div>
+
+                        <form id="route-form">
+                            {% csrf_token %}
+
+                            <button
+                                type="submit"
+                                id="find-route-button"
+                                class="route-button"
+                                disabled
+                            >
+                                Find Route
+                            </button>
+                        </form>
+
+                        <p
+                            id="route-status"
+                            class="route-status"
+                            role="status"
+                            aria-live="polite"
+                        >
+                            Select a starting point on the map.
+                        </p>
+
+                        <div
+                            id="route-result"
+                            class="route-result"
+                            hidden
+                        >
+
+                            <div>
+                                <small>Distance</small>
+
+                                <strong id="route-distance">
+                                    —
+                                </strong>
+                            </div>
+
+                            <div>
+                                <small>Estimated Drive</small>
+
+                                <strong id="route-duration">
+                                    —
+                                </strong>
+                            </div>
+
+                        </div>
+
+                        <p class="route-note">
+                            Routes are driving estimates.
+                            Some Palawan attractions require
+                            boat travel and may not have
+                            a connected road route.
+                        </p>
+
+                    </div>
 
                     <a
                         id="directions-link"
@@ -141,10 +246,14 @@
                     >
                         Open in OpenStreetMap ↗
                     </a>
+
                 </div>
+
             </div>
 
+            <!-- DESTINATION OVERVIEW -->
             <aside class="detail-sidebar">
+
                 <span class="eyebrow">
                     DESTINATION OVERVIEW
                 </span>
@@ -161,6 +270,7 @@
 
                 <div class="overview-row">
                     <span>Average Rating</span>
+
                     <strong>
                         {% if average_rating %}
                             ⭐ {{ average_rating|floatformat:1 }}/5
@@ -174,10 +284,14 @@
                     <span>Reviews</span>
                     <strong>{{ reviews.count }}</strong>
                 </div>
+
             </aside>
+
         </div>
 
+        <!-- REVIEWS -->
         <div class="reviews-section">
+
             <span class="eyebrow">
                 TRAVELER EXPERIENCES
             </span>
@@ -185,23 +299,152 @@
             <h2>Visitor Reviews</h2>
 
             {% for review in reviews %}
+
                 <div class="review-card">
+
                     <div class="review-top">
-                        <strong>{{ review.visitor.name }}</strong>
-                        <span>⭐ {{ review.rating }}/5</span>
+                        <strong>
+                            {{ review.visitor.name }}
+                        </strong>
+
+                        <span>
+                            ⭐ {{ review.rating }}/5
+                        </span>
                     </div>
 
                     <p>{{ review.comment }}</p>
+
                 </div>
+
             {% empty %}
+
                 <p class="no-reviews">
                     No reviews yet for this destination.
                 </p>
+
             {% endfor %}
+
         </div>
+
     </div>
 </section>
 
+
+<!-- ROUTE PLANNER STYLING -->
+<style>
+
+.route-panel {
+    margin-top: 24px;
+    padding: 26px;
+    border: 1px solid #e1e9df;
+    border-radius: 20px;
+    background: #ffffff;
+}
+
+.route-panel h3 {
+    margin: 10px 0;
+    color: #214b36;
+}
+
+.route-panel p {
+    line-height: 1.7;
+}
+
+.route-start {
+    padding: 17px;
+    margin: 20px 0;
+    background: #f5f7f2;
+    border-radius: 13px;
+}
+
+.route-start small,
+.route-result small {
+    display: block;
+    color: #778579;
+    margin-bottom: 7px;
+}
+
+.route-start strong {
+    display: block;
+    color: #214b36;
+    overflow-wrap: anywhere;
+}
+
+.route-button {
+    display: block;
+    width: 100%;
+    border: none;
+    border-radius: 12px;
+    background: #28543c;
+    color: #ffffff;
+    padding: 15px 20px;
+    font: inherit;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.route-button:hover:not(:disabled) {
+    background: #1d402e;
+}
+
+.route-button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.route-status {
+    margin: 16px 0;
+    color: #66766b;
+}
+
+.route-result {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+    margin-top: 18px;
+}
+
+.route-result[hidden] {
+    display: none;
+}
+
+.route-result div {
+    background: #f5f7f2;
+    padding: 18px;
+    border-radius: 12px;
+}
+
+.route-result strong {
+    display: block;
+    font-size: 21px;
+    color: #214b36;
+}
+
+.route-note {
+    font-size: 13px;
+    color: #7b887d;
+    margin-top: 18px;
+}
+
+#destination-map {
+    cursor: crosshair;
+}
+
+@media (max-width: 600px) {
+    .route-panel {
+        padding: 18px;
+    }
+
+    .route-result {
+        grid-template-columns: 1fr;
+    }
+}
+
+</style>
+
+
+<!-- LEAFLET CSS AND JAVASCRIPT -->
 <link
     rel="stylesheet"
     href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
@@ -209,42 +452,59 @@
 
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
+
+<!-- SAFE DJANGO DATA -->
 {{ spot.location.latitude|json_script:"spot-latitude" }}
 {{ spot.location.longitude|json_script:"spot-longitude" }}
 {{ spot.name|json_script:"spot-name" }}
 {{ spot.location.address|json_script:"spot-address" }}
 
+
+<!-- MAP AND ROUTING JAVASCRIPT -->
 <script>
+
 document.addEventListener("DOMContentLoaded", function () {
 
+    // DESTINATION DATA
     const latitude = Number(
         JSON.parse(
-            document.getElementById("spot-latitude").textContent
+            document.getElementById(
+                "spot-latitude"
+            ).textContent
         )
     );
 
     const longitude = Number(
         JSON.parse(
-            document.getElementById("spot-longitude").textContent
+            document.getElementById(
+                "spot-longitude"
+            ).textContent
         )
     );
 
     const spotName = JSON.parse(
-        document.getElementById("spot-name").textContent
+        document.getElementById(
+            "spot-name"
+        ).textContent
     );
 
     const spotAddress = JSON.parse(
-        document.getElementById("spot-address").textContent
+        document.getElementById(
+            "spot-address"
+        ).textContent
     );
 
-    if (!Number.isFinite(latitude) ||
-        !Number.isFinite(longitude)) {
+    if (
+        !Number.isFinite(latitude) ||
+        !Number.isFinite(longitude)
+    ) {
         return;
     }
 
+    // CREATE LEAFLET MAP
     const map = L.map("destination-map").setView(
         [latitude, longitude],
-        14
+        13
     );
 
     L.tileLayer(
@@ -256,11 +516,13 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     ).addTo(map);
 
+    // DESTINATION MARKER
     const popup = document.createElement("div");
-    const title = document.createElement("strong");
-    const address = document.createElement("p");
 
+    const title = document.createElement("strong");
     title.textContent = spotName;
+
+    const address = document.createElement("p");
     address.textContent = spotAddress;
 
     popup.appendChild(title);
@@ -271,22 +533,225 @@ document.addEventListener("DOMContentLoaded", function () {
         .bindPopup(popup)
         .openPopup();
 
+    // OPENSTREETMAP LINK
     const directionsLink = document.getElementById(
         "directions-link"
     );
 
-    const url = new URL(
+    const osmUrl = new URL(
         "https://www.openstreetmap.org/directions"
     );
 
-    url.searchParams.set(
+    osmUrl.searchParams.set(
         "to",
         latitude + "," + longitude
     );
 
-    directionsLink.href = url.toString();
+    directionsLink.href = osmUrl.toString();
+
+    // ROUTE VARIABLES
+    let startingPoint = null;
+    let startingMarker = null;
+    let routeLayer = null;
+    let requestInProgress = false;
+
+    const startLocation = document.getElementById(
+        "start-location"
+    );
+
+    const routeForm = document.getElementById(
+        "route-form"
+    );
+
+    const routeButton = document.getElementById(
+        "find-route-button"
+    );
+
+    const routeStatus = document.getElementById(
+        "route-status"
+    );
+
+    const routeResult = document.getElementById(
+        "route-result"
+    );
+
+    const routeDistance = document.getElementById(
+        "route-distance"
+    );
+
+    const routeDuration = document.getElementById(
+        "route-duration"
+    );
+
+    // SELECT STARTING POINT ON MAP
+    map.on("click", function (event) {
+
+        startingPoint = {
+            latitude: event.latlng.lat,
+            longitude: event.latlng.lng
+        };
+
+        if (startingMarker) {
+            map.removeLayer(startingMarker);
+        }
+
+        if (routeLayer) {
+            map.removeLayer(routeLayer);
+            routeLayer = null;
+        }
+
+        startingMarker = L.circleMarker(
+            event.latlng,
+            {
+                radius: 9,
+                color: "#28543c",
+                fillColor: "#82a982",
+                fillOpacity: 1
+            }
+        ).addTo(map);
+
+        startingMarker.bindPopup(
+            "Your selected starting point"
+        );
+
+        startLocation.textContent =
+            startingPoint.latitude.toFixed(5) +
+            ", " +
+            startingPoint.longitude.toFixed(5);
+
+        routeButton.disabled = requestInProgress;
+
+        routeResult.hidden = true;
+
+        routeStatus.textContent =
+            "Starting point selected. Click Find Route.";
+
+    });
+
+    // CALCULATE ROUTE
+    routeForm.addEventListener(
+        "submit",
+        async function (event) {
+
+            event.preventDefault();
+
+            if (!startingPoint || requestInProgress) {
+                return;
+            }
+
+            requestInProgress = true;
+            routeButton.disabled = true;
+            routeButton.textContent = "Calculating...";
+
+            routeResult.hidden = true;
+
+            routeStatus.textContent =
+                "Calculating your driving route...";
+
+            const selectedPoint = {
+                ...startingPoint
+            };
+
+            try {
+
+                const response = await fetch(
+                    "{% url 'calculate_route' spot.pk %}",
+                    {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json",
+                            "X-CSRFToken":
+                                routeForm.querySelector(
+                                    "[name=csrfmiddlewaretoken]"
+                                ).value
+                        },
+                        body: JSON.stringify(
+                            selectedPoint
+                        )
+                    }
+                );
+
+                const data = await response.json();
+
+                if (!response.ok) {
+                    throw new Error(
+                        data.error ||
+                        "Unable to calculate route."
+                    );
+                }
+
+                // IGNORE OLD RESULT IF START CHANGED
+                if (
+                    !startingPoint ||
+                    startingPoint.latitude !==
+                        selectedPoint.latitude ||
+                    startingPoint.longitude !==
+                        selectedPoint.longitude
+                ) {
+                    routeStatus.textContent =
+                        "Starting point changed. " +
+                        "Please calculate again.";
+                    return;
+                }
+
+                // REMOVE PREVIOUS ROUTE
+                if (routeLayer) {
+                    map.removeLayer(routeLayer);
+                }
+
+                // DRAW NEW ROUTE
+                routeLayer = L.geoJSON(
+                    {
+                        type: "Feature",
+                        geometry: data.geometry,
+                        properties: {}
+                    },
+                    {
+                        style: {
+                            color: "#28543c",
+                            weight: 5,
+                            opacity: 0.9
+                        }
+                    }
+                ).addTo(map);
+
+                // FIT ROUTE ON MAP
+                map.fitBounds(
+                    routeLayer.getBounds(),
+                    {
+                        padding: [35, 35]
+                    }
+                );
+
+                // DISPLAY DISTANCE AND TIME
+                routeDistance.textContent =
+                    data.distance_km + " km";
+
+                routeDuration.textContent =
+                    data.duration_minutes + " min";
+
+                routeResult.hidden = false;
+
+                routeStatus.textContent =
+                    "Driving route calculated successfully.";
+
+            } catch (error) {
+
+                routeStatus.textContent =
+                    error.message;
+
+            } finally {
+
+                requestInProgress = false;
+                routeButton.disabled = !startingPoint;
+                routeButton.textContent = "Find Route";
+
+            }
+        }
+    );
 
 });
+
 </script>
 
 {% endblock %}
