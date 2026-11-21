@@ -1,0 +1,137 @@
+
+{% extends "base.html" %}
+
+{% block title %}Admin Login | GalaGo{% endblock %}
+
+{% block content %}
+
+<style>
+    .admin-login-wrapper {
+        min-height: 75vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        padding: 50px 20px;
+    }
+
+    .admin-login-card {
+        width: 100%;
+        max-width: 430px;
+        background: white;
+        padding: 40px;
+        border-radius: 18px;
+        box-shadow: 0 10px 35px rgba(0,0,0,0.09);
+    }
+
+    .admin-login-card h1 {
+        font-size: 28px;
+        margin-bottom: 8px;
+        text-align: center;
+    }
+
+    .admin-login-card p {
+        text-align: center;
+        color: #777;
+        margin-bottom: 30px;
+    }
+
+    .admin-login-card label {
+        display: block;
+        margin-bottom: 8px;
+        font-weight: 600;
+    }
+
+    .admin-login-card input {
+        width: 100%;
+        padding: 13px;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        margin-bottom: 20px;
+        box-sizing: border-box;
+    }
+
+    .admin-login-card button {
+        width: 100%;
+        padding: 14px;
+        background: #167d68;
+        color: white;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        font-size: 16px;
+        font-weight: 600;
+    }
+
+    .admin-login-card button:hover {
+        background: #106653;
+    }
+
+    .login-error {
+        padding: 12px;
+        margin-bottom: 20px;
+        background: #ffe5e5;
+        color: #a12323;
+        border-radius: 8px;
+    }
+
+    .back-home {
+        display: block;
+        text-align: center;
+        margin-top: 20px;
+        color: #167d68;
+        text-decoration: none;
+    }
+</style>
+
+<div class="admin-login-wrapper">
+
+    <div class="admin-login-card">
+
+        <h1>GalaGo Admin</h1>
+        <p>Sign in to manage tourism records</p>
+
+        {% if messages %}
+            {% for message in messages %}
+                <div class="login-error">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        {% endif %}
+
+        <form method="POST">
+            {% csrf_token %}
+
+            <label for="username">Username</label>
+            <input
+                type="text"
+                id="username"
+                name="username"
+                placeholder="Enter admin username"
+                autocomplete="username"
+                required
+            >
+
+            <label for="password">Password</label>
+            <input
+                type="password"
+                id="password"
+                name="password"
+                placeholder="Enter password"
+                autocomplete="current-password"
+                required
+            >
+
+            <button type="submit">
+                Sign In
+            </button>
+        </form>
+
+        <a href="{% url 'home' %}" class="back-home">
+            Back to GalaGo
+        </a>
+
+    </div>
+
+</div>
+
+{% endblock %}

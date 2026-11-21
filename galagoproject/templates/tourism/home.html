@@ -1,9 +1,122 @@
 
 {% extends "base.html" %}
 
-{% block title %}Explore Palawan | GalaGo{% endblock %}
+{% block title %}
+    {% if request.resolver_match.url_name == "favorites" %}
+        My Favorites | GalaGo
+    {% else %}
+        Explore Palawan | GalaGo
+    {% endif %}
+{% endblock %}
 
 {% block content %}
+
+<style>
+    .favorite-card-wrapper {
+        position: relative;
+        min-width: 0;
+    }
+
+    .favorite-card-wrapper .destination-card {
+        display: block;
+        height: 100%;
+    }
+
+    .favorite-button {
+        position: absolute;
+        top: 14px;
+        right: 14px;
+        z-index: 5;
+        width: 42px;
+        height: 42px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: white;
+        color: #244b38;
+        border: none;
+        border-radius: 50%;
+        box-shadow: 0 3px 12px rgba(0, 0, 0, 0.12);
+        cursor: pointer;
+        font-size: 25px;
+        line-height: 1;
+        transition: all 0.2s ease;
+    }
+
+    .favorite-button:hover {
+        transform: scale(1.08);
+    }
+
+    .favorite-button.is-favorite {
+        color: #e34c68;
+    }
+
+    .favorites-heading {
+        padding: 45px 0 10px;
+    }
+
+    .favorites-heading h1 {
+        font-size: clamp(30px, 4vw, 44px);
+        color: #244b38;
+        margin: 10px 0;
+    }
+
+    .favorites-heading p {
+        color: #777;
+    }
+
+    .favorites-empty {
+        display: none;
+        text-align: center;
+        padding: 70px 24px;
+        background: #f8faf8;
+        border-radius: 18px;
+        margin-top: 25px;
+    }
+
+    .favorites-empty .empty-heart {
+        font-size: 50px;
+        color: #e34c68;
+    }
+
+    .favorites-empty h3 {
+        margin: 15px 0 10px;
+        color: #244b38;
+    }
+
+    .favorites-empty p {
+        color: #777;
+        margin-bottom: 25px;
+    }
+
+    .favorites-empty a {
+        display: inline-block;
+        padding: 12px 22px;
+        background: #167d68;
+        color: white;
+        border-radius: 9px;
+        text-decoration: none;
+    }
+
+    .favorite-notice {
+        position: fixed;
+        bottom: 85px;
+        right: 22px;
+        z-index: 1000;
+        background: #244b38;
+        color: white;
+        padding: 12px 20px;
+        border-radius: 10px;
+        box-shadow: 0 5px 18px rgba(0, 0, 0, 0.15);
+        font-size: 14px;
+    }
+
+    [hidden] {
+        display: none !important;
+    }
+</style>
+
+{% if request.resolver_match.url_name != "favorites" %}
 
 <section class="hero">
     <div class="container hero-content">
@@ -31,150 +144,428 @@
     </div>
 </section>
 
+{% endif %}
+
 <section class="explore" id="destinations">
     <div class="container">
 
-        <div class="section-top">
-            <div>
+        {% if request.resolver_match.url_name == "favorites" %}
+
+            <div class="favorites-heading">
                 <span class="eyebrow">
-                    THE ADVENTURE STARTS HERE
+                    YOUR SAVED DESTINATIONS
                 </span>
 
-                <h2>Discover Palawan</h2>
+                <h1>My Favorites ♡</h1>
 
                 <p>
-                    Beautiful places waiting to be explored.
+                    Your favorite places in Palawan,
+                    all in one place.
                 </p>
             </div>
 
-            <span class="spot-count">
-                {{ spot_count }} destinations
-            </span>
-        </div>
+        {% else %}
 
-        <form
-            method="GET"
-            action="{% url 'home' %}"
-            class="search-box"
-        >
-            <span class="search-icon">⌕</span>
+            <div class="section-top">
+                <div>
+                    <span class="eyebrow">
+                        THE ADVENTURE STARTS HERE
+                    </span>
 
-            <input
-                type="text"
-                name="q"
-                value="{{ query }}"
-                placeholder="Search beaches, lagoons, islands..."
-            >
+                    <h2>Discover Palawan</h2>
 
-            {% if selected_category %}
-                <input
-                    type="hidden"
-                    name="category"
-                    value="{{ selected_category }}"
-                >
-            {% endif %}
-
-            <button type="submit">Search</button>
-        </form>
-
-        <div class="category-row">
-            <a
-                href="{% url 'home' %}#destinations"
-                class="category-chip {% if not selected_category %}selected{% endif %}"
-            >
-                All Places
-            </a>
-
-            {% for category in categories %}
-                <a
-                    href="?category={{ category.pk }}#destinations"
-                    class="category-chip {% if selected_category == category.pk|stringformat:'s' %}selected{% endif %}"
-                >
-                    {{ category.name }}
-                </a>
-            {% endfor %}
-        </div>
-
-        <div class="results-heading">
-            <h3>Places to explore</h3>
-
-            <span>
-                {{ spots|length }} results
-            </span>
-        </div>
-
-        <div class="destination-grid">
-
-            {% for spot in spots %}
-
-                <a
-                    href="{% url 'spot_detail' spot.pk %}"
-                    class="destination-card"
-                >
-                    <div class="card-image">
-                        {% if spot.image %}
-                            <img
-                                src="{{ spot.image.url }}"
-                                alt="{{ spot.name }}"
-                                loading="lazy"
-                            >
-                        {% else %}
-                            <div class="image-placeholder">
-                                <span>🌴</span>
-                                <small>Discover Palawan</small>
-                            </div>
-                        {% endif %}
-
-                        <span class="card-category">
-                            {{ spot.category.name }}
-                        </span>
-                    </div>
-
-                    <div class="card-body">
-                        <div class="card-location">
-                            📍 {{ spot.location.name }}
-                        </div>
-
-                        <h3>{{ spot.name }}</h3>
-
-                        <p>
-                            {{ spot.description|truncatewords:20 }}
-                        </p>
-
-                        <div class="card-bottom">
-                            <span>View destination</span>
-                            <span class="arrow-circle">↗</span>
-                        </div>
-                    </div>
-                </a>
-
-            {% empty %}
-
-                <div class="empty-state">
-                    <span>🌿</span>
-                    <h3>No destinations found</h3>
                     <p>
-                        Try another search or add tourist
-                        spots through Django Admin.
+                        Beautiful places waiting to be explored.
                     </p>
                 </div>
 
+                <span class="spot-count">
+                    {{ spot_count }} destinations
+                </span>
+            </div>
+
+            <form
+                method="GET"
+                action="{% url 'home' %}"
+                class="search-box"
+            >
+                <span class="search-icon">⌕</span>
+
+                <input
+                    type="text"
+                    name="q"
+                    value="{{ query }}"
+                    placeholder="Search beaches, lagoons, islands..."
+                >
+
+                {% if selected_category %}
+                    <input
+                        type="hidden"
+                        name="category"
+                        value="{{ selected_category }}"
+                    >
+                {% endif %}
+
+                <button type="submit">Search</button>
+            </form>
+
+            <div class="category-row">
+                <a
+                    href="{% url 'home' %}#destinations"
+                    class="category-chip {% if not selected_category %}selected{% endif %}"
+                >
+                    All Places
+                </a>
+
+                {% for category in categories %}
+                    <a
+                        href="?category={{ category.pk }}#destinations"
+                        class="category-chip {% if selected_category == category.pk|stringformat:'s' %}selected{% endif %}"
+                    >
+                        {{ category.name }}
+                    </a>
+                {% endfor %}
+            </div>
+
+        {% endif %}
+
+        <div class="results-heading">
+            <h3>
+                {% if request.resolver_match.url_name == "favorites" %}
+                    Saved destinations
+                {% else %}
+                    Places to explore
+                {% endif %}
+            </h3>
+
+            <span id="results-count">
+                {% if request.resolver_match.url_name == "favorites" %}
+                    0 saved
+                {% else %}
+                    {{ spots|length }} results
+                {% endif %}
+            </span>
+        </div>
+
+        <div class="destination-grid" id="destination-grid">
+
+            {% for spot in spots %}
+
+                <div
+                    class="favorite-card-wrapper"
+                    data-spot-id="{{ spot.pk }}"
+                    {% if request.resolver_match.url_name == "favorites" %}
+                        hidden
+                    {% endif %}
+                >
+
+                    <a
+                        href="{% url 'spot_detail' spot.pk %}"
+                        class="destination-card"
+                    >
+                        <div class="card-image">
+
+                            {% if spot.image %}
+                                <img
+                                    src="{{ spot.image.url }}"
+                                    alt="{{ spot.name }}"
+                                    loading="lazy"
+                                >
+                            {% else %}
+                                <div class="image-placeholder">
+                                    <span>🌴</span>
+                                    <small>Discover Palawan</small>
+                                </div>
+                            {% endif %}
+
+                            <span class="card-category">
+                                {{ spot.category.name }}
+                            </span>
+
+                        </div>
+
+                        <div class="card-body">
+
+                            <div class="card-location">
+                                📍 {{ spot.location.name }}
+                            </div>
+
+                            <h3>{{ spot.name }}</h3>
+
+                            <p>
+                                {{ spot.description|truncatewords:20 }}
+                            </p>
+
+                            <div class="card-bottom">
+                                <span>View destination</span>
+                                <span class="arrow-circle">↗</span>
+                            </div>
+
+                        </div>
+                    </a>
+
+                    <button
+                        type="button"
+                        class="favorite-button"
+                        data-favorite-id="{{ spot.pk }}"
+                        data-spot-name="{{ spot.name }}"
+                        aria-label="Save {{ spot.name }} to favorites"
+                        aria-pressed="false"
+                        title="Save to Favorites"
+                    >
+                        ♡
+                    </button>
+
+                </div>
+
+            {% empty %}
+
+                {% if request.resolver_match.url_name != "favorites" %}
+                    <div class="empty-state">
+                        <span>🌿</span>
+                        <h3>No destinations found</h3>
+                        <p>
+                            Try another search or add tourist
+                            spots through Django Admin.
+                        </p>
+                    </div>
+                {% endif %}
+
             {% endfor %}
 
         </div>
+
+        {% if request.resolver_match.url_name == "favorites" %}
+
+            <div class="favorites-empty" id="favorites-empty">
+                <div class="empty-heart">♡</div>
+
+                <h3>No favorites yet</h3>
+
+                <p>
+                    Explore Palawan and tap the heart
+                    icon to save destinations you love.
+                </p>
+
+                <a href="{% url 'home' %}#destinations">
+                    Explore Destinations ↗
+                </a>
+            </div>
+
+        {% endif %}
+
     </div>
 </section>
+
+{% if request.resolver_match.url_name != "favorites" %}
 
 <section class="closing-banner">
     <div class="container">
         <span>YOUR NEXT ADVENTURE AWAITS</span>
+
         <h2>There's more to discover.</h2>
+
         <p>
             Explore the natural beauty of Palawan,
             one destination at a time.
         </p>
-        <a href="#destinations">Find your escape ↗</a>
+
+        <a href="#destinations">
+            Find your escape ↗
+        </a>
     </div>
 </section>
+
+{% endif %}
+
+<div
+    id="favorite-notice"
+    class="favorite-notice"
+    role="status"
+    aria-live="polite"
+    hidden
+></div>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+
+    const STORAGE_KEY = "galago_favorites";
+
+    const isFavoritesPage = (
+        "{{ request.resolver_match.url_name }}" === "favorites"
+    );
+
+    const cards = document.querySelectorAll(
+        ".favorite-card-wrapper"
+    );
+
+    const buttons = document.querySelectorAll(
+        ".favorite-button"
+    );
+
+    const resultsCount = document.getElementById(
+        "results-count"
+    );
+
+    const emptyState = document.getElementById(
+        "favorites-empty"
+    );
+
+    const notice = document.getElementById(
+        "favorite-notice"
+    );
+
+    let noticeTimeout;
+
+    function getFavorites() {
+        try {
+            const stored = localStorage.getItem(STORAGE_KEY);
+            const parsed = stored ? JSON.parse(stored) : [];
+
+            if (!Array.isArray(parsed)) {
+                return [];
+            }
+
+            return parsed.map(String);
+        } catch (error) {
+            return [];
+        }
+    }
+
+    function saveFavorites(favorites) {
+        try {
+            localStorage.setItem(
+                STORAGE_KEY,
+                JSON.stringify(favorites)
+            );
+            return true;
+        } catch (error) {
+            showNotice("Unable to save favorites in this browser.");
+            return false;
+        }
+    }
+
+    function showNotice(message) {
+        if (!notice) {
+            return;
+        }
+
+        notice.textContent = message;
+        notice.hidden = false;
+
+        clearTimeout(noticeTimeout);
+
+        noticeTimeout = setTimeout(function () {
+            notice.hidden = true;
+        }, 2500);
+    }
+
+    function refreshFavorites() {
+        const favorites = getFavorites();
+
+        let visibleCount = 0;
+
+        cards.forEach(function (card) {
+            const id = card.dataset.spotId;
+            const isSaved = favorites.includes(id);
+
+            const button = card.querySelector(
+                ".favorite-button"
+            );
+
+            if (button) {
+                button.textContent = isSaved ? "♥" : "♡";
+                button.classList.toggle(
+                    "is-favorite",
+                    isSaved
+                );
+
+                button.setAttribute(
+                    "aria-pressed",
+                    String(isSaved)
+                );
+
+                button.setAttribute(
+                    "aria-label",
+                    isSaved
+                        ? "Remove from favorites"
+                        : "Save to favorites"
+                );
+
+                button.title = isSaved
+                    ? "Remove from Favorites"
+                    : "Save to Favorites";
+            }
+
+            if (isFavoritesPage) {
+                card.hidden = !isSaved;
+
+                if (isSaved) {
+                    visibleCount++;
+                }
+            }
+        });
+
+        if (isFavoritesPage) {
+            if (resultsCount) {
+                resultsCount.textContent =
+                    visibleCount + " saved";
+            }
+
+            if (emptyState) {
+                emptyState.style.display =
+                    visibleCount === 0 ? "block" : "none";
+            }
+        }
+    }
+
+    buttons.forEach(function (button) {
+        button.addEventListener("click", function () {
+
+            const id = String(
+                button.dataset.favoriteId
+            );
+
+            const name = button.dataset.spotName;
+
+            const favorites = getFavorites();
+
+            const alreadySaved = favorites.includes(id);
+
+            let updatedFavorites;
+
+            if (alreadySaved) {
+                updatedFavorites = favorites.filter(
+                    function (savedId) {
+                        return savedId !== id;
+                    }
+                );
+            } else {
+                updatedFavorites = [...favorites, id];
+            }
+
+            if (!saveFavorites(updatedFavorites)) {
+                return;
+            }
+
+            refreshFavorites();
+
+            if (alreadySaved) {
+                showNotice(name + " removed from favorites.");
+            } else {
+                showNotice(name + " added to favorites!");
+            }
+        });
+    });
+
+    window.addEventListener("storage", function (event) {
+        if (event.key === STORAGE_KEY) {
+            refreshFavorites();
+        }
+    });
+
+    refreshFavorites();
+});
+</script>
 
 {% endblock %}

@@ -7,12 +7,14 @@ from urllib.request import Request, urlopen
 from urllib.parse import urlencode
 from urllib.error import HTTPError, URLError
 
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import render, get_object_or_404, redirect
 from django.db.models import Q, Avg
 from django.http import JsonResponse
+from django.contrib import messages
 from django.views.decorators.http import require_POST
 
-from .models import TouristSpot, Category
+from .models import TouristSpot, Category, Visitor, Review
+from .forms import VisitorReviewForm
 
 
 # ==========================================
@@ -77,9 +79,7 @@ def get_weather(latitude, longitude):
     })
 
     url = (
-        "https://api.openrouteservice.org"
-        "/v2/directions/driving-car/geojson"
-        
+        "https://api.open-meteo.com/v1/forecast?"
         + parameters
     )
 
@@ -116,21 +116,11 @@ def get_weather(latitude, longitude):
         code = current.get("weather_code")
 
         return {
-            "temperature": current.get(
-                "temperature_2m"
-            ),
-            "feels_like": current.get(
-                "apparent_temperature"
-            ),
-            "humidity": current.get(
-                "relative_humidity_2m"
-            ),
-            "precipitation": current.get(
-                "precipitation"
-            ),
-            "wind_speed": current.get(
-                "wind_speed_10m"
-            ),
+            "temperature": current.get("temperature_2m"),
+            "feels_like": current.get("apparent_temperature"),
+            "humidity": current.get("relative_humidity_2m"),
+            "precipitation": current.get("precipitation"),
+            "wind_speed": current.get("wind_speed_10m"),
             "description": weather_codes.get(
                 code,
                 "Weather information"
@@ -162,17 +152,63 @@ def spot_detail(request, pk):
         pk=pk,
     )
 
+    # Handle visitor review submissions.
+    if request.method == "POST":
+
+        form = VisitorReviewForm(request.POST)
+
+        if form.is_valid():
+
+            visitor, created = Visitor.objects.get_or_create(
+                email=form.cleaned_data["email"],
+                defaults={
+                    "name": form.cleaned_data["name"]
+                }
+            )
+
+            Review.objects.create(
+                tourist_spot=spot,
+                visitor=visitor,
+                rating=form.cleaned_data["rating"],
+                comment=form.cleaned_data["comment"],
+            )
+
+            # Remember successful submission for next page load.
+            request.session["review_submitted_spot"] = spot.pk
+
+            messages.success(
+                request,
+                "Thank you! Your review has been submitted."
+            )
+
+            return redirect(
+                "spot_detail",
+                pk=spot.pk
+            )
+
+    else:
+        form = VisitorReviewForm()
+
+    # Retrieve reviews.
     reviews = spot.review_set.select_related(
         "visitor"
     ).order_by("-created_at")
 
+    # Calculate average rating.
     average_rating = reviews.aggregate(
         average=Avg("rating")
     )["average"]
 
+    # Retrieve weather.
     weather = get_weather(
         float(spot.location.latitude),
         float(spot.location.longitude),
+    )
+
+    # Hide form only after a successful submission.
+    review_submitted = (
+        request.session.pop("review_submitted_spot", None)
+        == spot.pk
     )
 
     return render(
@@ -183,6 +219,8 @@ def spot_detail(request, pk):
             "reviews": reviews,
             "average_rating": average_rating,
             "weather": weather,
+            "review_form": form,
+            "review_submitted": review_submitted,
         }
     )
 
@@ -194,16 +232,11 @@ def spot_detail(request, pk):
 @require_POST
 def calculate_route(request, pk):
 
-    # Get the destination from the database.
     spot = get_object_or_404(
-        TouristSpot.objects.select_related(
-            "location"
-        ),
+        TouristSpot.objects.select_related("location"),
         pk=pk,
     )
 
-    # Read the API key from the environment.
-    # settings.py must load the .env file.
     api_key = os.environ.get(
         "OPENROUTESERVICE_API_KEY",
         ""
@@ -220,17 +253,11 @@ def calculate_route(request, pk):
             status=503
         )
 
-    # Read the starting point selected on the map.
     try:
         body = json.loads(request.body)
 
-        start_latitude = float(
-            body["latitude"]
-        )
-
-        start_longitude = float(
-            body["longitude"]
-        )
+        start_latitude = float(body["latitude"])
+        start_longitude = float(body["longitude"])
 
         if not (
             math.isfinite(start_latitude)
@@ -260,7 +287,6 @@ def calculate_route(request, pk):
             status=400
         )
 
-    # Destination coordinates from the database.
     destination_latitude = float(
         spot.location.latitude
     )
@@ -269,22 +295,13 @@ def calculate_route(request, pk):
         spot.location.longitude
     )
 
-    # OpenRouteService expects coordinates as:
-    # [longitude, latitude]
     payload = {
         "coordinates": [
-            [
-                start_longitude,
-                start_latitude
-            ],
-            [
-                destination_longitude,
-                destination_latitude
-            ]
+            [start_longitude, start_latitude],
+            [destination_longitude, destination_latitude]
         ]
     }
 
-    # OpenRouteService driving directions endpoint.
     url = (
         "https://api.openrouteservice.org"
         "/v2/directions/driving-car/geojson"
@@ -292,9 +309,7 @@ def calculate_route(request, pk):
 
     api_request = Request(
         url,
-        data=json.dumps(
-            payload
-        ).encode("utf-8"),
+        data=json.dumps(payload).encode("utf-8"),
         headers={
             "Authorization": api_key,
             "Content-Type": "application/json",
@@ -303,7 +318,6 @@ def calculate_route(request, pk):
         method="POST"
     )
 
-    # Request the route.
     try:
         with urlopen(
             api_request,
@@ -311,10 +325,7 @@ def calculate_route(request, pk):
         ) as response:
             route_data = json.load(response)
 
-        features = route_data.get(
-            "features",
-            []
-        )
+        features = route_data.get("features", [])
 
         if not features:
             return JsonResponse(
@@ -329,39 +340,20 @@ def calculate_route(request, pk):
 
         feature = features[0]
 
-        properties = feature.get(
-            "properties",
-            {}
-        )
-
-        summary = properties.get(
-            "summary",
-            {}
-        )
-
-        geometry = feature.get(
-            "geometry"
-        )
+        properties = feature.get("properties", {})
+        summary = properties.get("summary", {})
+        geometry = feature.get("geometry")
 
         if not geometry:
             return JsonResponse(
                 {
-                    "error": (
-                        "Route geometry is unavailable."
-                    )
+                    "error": "Route geometry is unavailable."
                 },
                 status=502
             )
 
-        distance_meters = summary.get(
-            "distance",
-            0
-        )
-
-        duration_seconds = summary.get(
-            "duration",
-            0
-        )
+        distance_meters = summary.get("distance", 0)
+        duration_seconds = summary.get("duration", 0)
 
         return JsonResponse(
             {
@@ -376,14 +368,8 @@ def calculate_route(request, pk):
             }
         )
 
-    # ==========================================
-    # OPENROUTESERVICE ERROR HANDLING
-    # ==========================================
-
     except HTTPError as error:
 
-        # Temporary debugging information.
-        # These messages appear in the Django terminal.
         print(
             "OpenRouteService HTTP status:",
             error.code

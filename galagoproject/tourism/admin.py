@@ -27,6 +27,7 @@ class LocationAdmin(admin.ModelAdmin):
 @admin.register(TouristSpot)
 class TouristSpotAdmin(admin.ModelAdmin):
     list_display = ("id", "name", "category", "location", "created_at")
+    list_display_links = ("name",)
     list_filter = ("category",)
     search_fields = ("name", "description")
 

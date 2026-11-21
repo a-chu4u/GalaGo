@@ -1,450 +1,791 @@
 
 {% extends "base.html" %}
+{% load static %}
 
 {% block title %}{{ spot.name }} | GalaGo{% endblock %}
 
 {% block content %}
 
-<section class="detail-page">
-    <div class="container">
+<style>
+    .spot-page {
+        max-width: 1150px;
+        margin: 0 auto;
+        padding: 35px 22px 75px;
+    }
 
-        <!-- BACK BUTTON -->
-        <a href="{% url 'home' %}" class="back-link">
-            ← Back to Explore
-        </a>
+    .spot-back {
+        display: inline-block;
+        margin-bottom: 24px;
+        color: #24614b;
+        text-decoration: none;
+        font-weight: 600;
+    }
 
-        <!-- DESTINATION HEADER -->
-        <div class="detail-heading">
-            <span class="eyebrow">
-                {{ spot.category.name }}
+    .spot-title {
+        font-size: clamp(30px, 4vw, 46px);
+        color: #244b38;
+        margin-bottom: 10px;
+    }
+
+    .spot-meta {
+        color: #6c7971;
+        margin-bottom: 25px;
+    }
+
+    .spot-image {
+        width: 100%;
+        height: 430px;
+        object-fit: cover;
+        border-radius: 20px;
+        display: block;
+    }
+
+    .spot-placeholder {
+        height: 300px;
+        background: #e6eee8;
+        border-radius: 20px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #587260;
+    }
+
+    .spot-section,
+    .visitor-review-section {
+        margin-top: 35px;
+        padding: 30px;
+        background: white;
+        border: 1px solid #e5ebe7;
+        border-radius: 18px;
+    }
+
+    .spot-section h2,
+    .visitor-review-section h2 {
+        color: #244b38;
+        font-size: 24px;
+        margin-bottom: 15px;
+    }
+
+    .spot-description {
+        color: #53635a;
+        line-height: 1.8;
+        white-space: pre-line;
+    }
+
+    /* FAVORITES */
+
+    .spot-title-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 16px;
+        flex-wrap: wrap;
+    }
+
+    .spot-favorite-btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 9px;
+        padding: 12px 18px;
+        background: white;
+        border: 1.5px solid #244b38;
+        border-radius: 999px;
+        color: #244b38;
+        font: inherit;
+        font-size: 14px;
+        font-weight: 700;
+        cursor: pointer;
+        transition: all 0.2s ease;
+    }
+
+    .spot-favorite-btn:hover {
+        background: #edf5ef;
+    }
+
+    .spot-favorite-btn.is-favorite {
+        color: #b93652;
+        border-color: #b93652;
+    }
+
+    .spot-favorite-btn .heart {
+        font-size: 22px;
+        line-height: 1;
+    }
+
+    .favorite-feedback {
+        color: #53635a;
+        font-size: 13px;
+        margin: 0 0 20px;
+    }
+
+    /* WEATHER */
+
+    .weather-grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 15px;
+        margin-top: 22px;
+    }
+
+    .weather-item {
+        padding: 20px;
+        background: #f2f7f3;
+        border-radius: 12px;
+    }
+
+    .weather-item small {
+        display: block;
+        color: #68776d;
+        margin-bottom: 8px;
+    }
+
+    .weather-item strong {
+        color: #244b38;
+        font-size: 21px;
+    }
+
+    .weather-description {
+        color: #587260;
+        margin-bottom: 12px;
+    }
+
+    .weather-note,
+    .route-note {
+        color: #77847b;
+        font-size: 13px;
+        margin-top: 15px;
+        line-height: 1.6;
+    }
+
+    /* MAP AND ROUTE */
+
+    #destination-map {
+        height: 390px;
+        width: 100%;
+        border-radius: 14px;
+        margin-top: 20px;
+        z-index: 1;
+    }
+
+    .route-panel {
+        margin-top: 25px;
+        padding: 25px;
+        background: #f4f8f5;
+        border: 1px solid #e0e9e2;
+        border-radius: 14px;
+    }
+
+    .route-panel h3 {
+        color: #244b38;
+        margin-bottom: 10px;
+    }
+
+    .route-panel p {
+        color: #64746a;
+        line-height: 1.6;
+    }
+
+    .route-start {
+        margin-top: 18px;
+        padding: 14px;
+        background: white;
+        border: 1px solid #dce6de;
+        border-radius: 9px;
+        color: #53635a;
+        overflow-wrap: anywhere;
+    }
+
+    .route-button,
+    .review-submit-btn {
+        padding: 13px 23px;
+        background: #244b38;
+        color: white;
+        border: none;
+        border-radius: 9px;
+        font: inherit;
+        font-weight: 700;
+        cursor: pointer;
+        margin-top: 16px;
+    }
+
+    .route-button:hover,
+    .review-submit-btn:hover {
+        background: #167d68;
+    }
+
+    .route-button:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+    }
+
+    .route-status {
+        margin-top: 14px;
+        color: #637369;
+        font-size: 14px;
+    }
+
+    .route-result {
+        display: none;
+        margin-top: 18px;
+        padding: 18px;
+        background: #e7f3eb;
+        border-radius: 10px;
+        color: #244b38;
+        font-weight: 600;
+    }
+
+    .route-result.visible {
+        display: block;
+    }
+
+    /* REVIEWS */
+
+    .review-summary {
+        color: #66756c;
+        margin-bottom: 20px;
+    }
+
+    .review-card {
+        padding: 20px 0;
+        border-bottom: 1px solid #e6ece8;
+    }
+
+    .review-card:last-child {
+        border-bottom: none;
+    }
+
+    .review-heading {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        gap: 12px;
+    }
+
+    .review-heading strong {
+        color: #244b38;
+    }
+
+    .review-date {
+        font-size: 12px;
+        color: #8a948e;
+    }
+
+    .review-stars {
+        color: #e6a23c;
+        margin: 8px 0;
+        letter-spacing: 2px;
+    }
+
+    .review-comment {
+        color: #53635a;
+        line-height: 1.7;
+        white-space: pre-line;
+        overflow-wrap: anywhere;
+    }
+
+    .visitor-review-section > p {
+        color: #66736c;
+        margin-bottom: 25px;
+    }
+
+    .visitor-review-form {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+    }
+
+    .visitor-review-form label {
+        font-weight: 600;
+        color: #244b38;
+    }
+
+    .review-input {
+        width: 100%;
+        padding: 13px 15px;
+        border: 1px solid #d5ded8;
+        border-radius: 9px;
+        font: inherit;
+        box-sizing: border-box;
+        background: white;
+    }
+
+    .review-input:focus {
+        outline: none;
+        border-color: #167d68;
+    }
+
+    .star-rating {
+        display: flex;
+        flex-direction: row-reverse;
+        justify-content: flex-end;
+        gap: 5px;
+        width: fit-content;
+        margin: 4px 0 10px;
+    }
+
+    .star-rating input {
+        position: absolute;
+        opacity: 0;
+        width: 1px;
+        height: 1px;
+    }
+
+    .star-rating label {
+        font-size: 37px;
+        line-height: 1.2;
+        color: #cbd5ce;
+        cursor: pointer;
+        transition: color 0.15s ease;
+    }
+
+    .star-rating label:hover,
+    .star-rating label:hover ~ label,
+    .star-rating input:checked ~ label {
+        color: #e6a23c;
+    }
+
+    .star-rating input:focus-visible + label {
+        outline: 2px solid #167d68;
+        outline-offset: 3px;
+        border-radius: 4px;
+    }
+
+    .review-success {
+        background: #e6f4eb;
+        color: #226b43;
+        padding: 24px;
+        border-radius: 12px;
+    }
+
+    .review-success h2 {
+        color: #226b43;
+        margin-bottom: 10px;
+    }
+
+    .review-success p {
+        line-height: 1.7;
+    }
+
+    .review-error,
+    .visitor-review-form .errorlist {
+        color: #b42318;
+        font-size: 13px;
+    }
+
+    .review-optional {
+        color: #849088;
+        font-size: 13px;
+        font-weight: normal;
+    }
+
+    @media (max-width: 768px) {
+        .spot-page {
+            padding: 25px 15px 90px;
+        }
+
+        .spot-image {
+            height: 250px;
+        }
+
+        .spot-section,
+        .visitor-review-section {
+            padding: 22px;
+        }
+
+        .weather-grid {
+            grid-template-columns: repeat(2, 1fr);
+        }
+
+        #destination-map {
+            height: 320px;
+        }
+    }
+</style>
+
+<div class="spot-page">
+
+    <a href="{% url 'home' %}#destinations" class="spot-back">
+        ← Back to Destinations
+    </a>
+
+    <!-- DESTINATION TITLE AND FAVORITES -->
+
+    <div class="spot-title-row">
+        <h1 class="spot-title">{{ spot.name }}</h1>
+
+        <button
+            type="button"
+            id="spot-favorite-button"
+            class="spot-favorite-btn"
+            aria-pressed="false"
+        >
+            <span class="heart">♡</span>
+            <span class="favorite-label">
+                Save to Favorites
             </span>
+        </button>
+    </div>
 
-            <h1>{{ spot.name }}</h1>
+    <p class="spot-meta">
+        {{ spot.category.name }}
 
-            <p>📍 {{ spot.location.address }}</p>
+        {% if spot.location.name %}
+            · {{ spot.location.name }}
+        {% endif %}
+    </p>
+
+    <p
+        id="favorite-feedback"
+        class="favorite-feedback"
+        role="status"
+        aria-live="polite"
+    ></p>
+
+    <!-- DESTINATION IMAGE -->
+
+    {% if spot.image %}
+        <img
+            src="{{ spot.image.url }}"
+            alt="{{ spot.name }}"
+            class="spot-image"
+        >
+    {% else %}
+        <div class="spot-placeholder">
+            No destination image available
         </div>
+    {% endif %}
 
-        <!-- DESTINATION IMAGE -->
-        <div class="detail-image">
-            {% if spot.image %}
-                <img
-                    src="{{ spot.image.url }}"
-                    alt="{{ spot.name }}"
-                >
-            {% else %}
-                <div class="image-placeholder">
-                    <span>🌴</span>
-                    <small>Explore Palawan</small>
-                </div>
-            {% endif %}
+    <!-- DESTINATION DESCRIPTION -->
+
+    <section class="spot-section">
+        <h2>About This Destination</h2>
+
+        <div class="spot-description">
+            {{ spot.description }}
         </div>
+    </section>
 
-        <!-- DESTINATION CONTENT -->
-        <div class="detail-grid">
+    <!-- LIVE WEATHER -->
 
-            <div class="detail-main">
+    <section class="spot-section">
+        <h2>Current Weather</h2>
 
-                <!-- DESCRIPTION -->
-                <h2>About this destination</h2>
+        {% if weather %}
 
-                <p class="detail-description">
-                    {{ spot.description }}
-                </p>
+            <p class="weather-description">
+                {{ weather.description }}
+            </p>
 
-                <!-- WEATHER -->
-                <h2>Current Weather</h2>
+            <div class="weather-grid">
 
-                <div class="weather-card">
-
-                    {% if weather %}
-
-                        <div class="weather-heading">
-                            <div>
-                                <span class="eyebrow">
-                                    LIVE WEATHER DATA
-                                </span>
-
-                                <h3>
-                                    {{ weather.description }}
-                                </h3>
-                            </div>
-
-                            <div class="weather-temperature">
-                                {{ weather.temperature|floatformat:0 }}°C
-                            </div>
-                        </div>
-
-                        <div class="weather-grid">
-
-                            <div>
-                                <small>Feels Like</small>
-                                <strong>
-                                    {{ weather.feels_like|floatformat:0 }}°C
-                                </strong>
-                            </div>
-
-                            <div>
-                                <small>Humidity</small>
-                                <strong>
-                                    {{ weather.humidity }}%
-                                </strong>
-                            </div>
-
-                            <div>
-                                <small>Wind Speed</small>
-                                <strong>
-                                    {{ weather.wind_speed }} km/h
-                                </strong>
-                            </div>
-
-                            <div>
-                                <small>Precipitation</small>
-                                <strong>
-                                    {{ weather.precipitation }} mm
-                                </strong>
-                            </div>
-
-                        </div>
-
-                        <p class="weather-note">
-                            Weather data provided by Open-Meteo.
-                            Updated: {{ weather.updated_at }}
-                            (Philippine time)
-                        </p>
-
-                    {% else %}
-
-                        <p class="weather-unavailable">
-                            Weather information is temporarily unavailable.
-                            Please try again later.
-                        </p>
-
-                    {% endif %}
-
+                <div class="weather-item">
+                    <small>Temperature</small>
+                    <strong>{{ weather.temperature }}°C</strong>
                 </div>
 
-                <!-- LOCATION -->
-                <h2>Where to find it</h2>
-
-                <p>{{ spot.location.address }}</p>
-
-                <div class="coordinates">
-
-                    <div>
-                        <small>Latitude</small>
-                        <strong>
-                            {{ spot.location.latitude }}
-                        </strong>
-                    </div>
-
-                    <div>
-                        <small>Longitude</small>
-                        <strong>
-                            {{ spot.location.longitude }}
-                        </strong>
-                    </div>
-
+                <div class="weather-item">
+                    <small>Feels Like</small>
+                    <strong>{{ weather.feels_like }}°C</strong>
                 </div>
 
-                <!-- MAP -->
-                <div class="map-section">
+                <div class="weather-item">
+                    <small>Humidity</small>
+                    <strong>{{ weather.humidity }}%</strong>
+                </div>
 
-                    <h3>Explore on the map</h3>
-
-                    <p>
-                        View this destination and calculate
-                        a driving route from your selected
-                        starting location.
-                    </p>
-
-                    <div id="destination-map"></div>
-
-                    <!-- ROUTE PLANNER -->
-                    <div class="route-panel">
-
-                        <span class="eyebrow">
-                            PLAN YOUR ROUTE
-                        </span>
-
-                        <h3>Find a driving route</h3>
-
-                        <p>
-                            Click anywhere on the map to
-                            choose your starting location.
-                            Then click Find Route.
-                        </p>
-
-                        <div class="route-start">
-                            <small>Starting Location</small>
-
-                            <strong id="start-location">
-                                Not selected
-                            </strong>
-                        </div>
-
-                        <form id="route-form">
-                            {% csrf_token %}
-
-                            <button
-                                type="submit"
-                                id="find-route-button"
-                                class="route-button"
-                                disabled
-                            >
-                                Find Route
-                            </button>
-                        </form>
-
-                        <p
-                            id="route-status"
-                            class="route-status"
-                            role="status"
-                            aria-live="polite"
-                        >
-                            Select a starting point on the map.
-                        </p>
-
-                        <div
-                            id="route-result"
-                            class="route-result"
-                            hidden
-                        >
-
-                            <div>
-                                <small>Distance</small>
-
-                                <strong id="route-distance">
-                                    —
-                                </strong>
-                            </div>
-
-                            <div>
-                                <small>Estimated Drive</small>
-
-                                <strong id="route-duration">
-                                    —
-                                </strong>
-                            </div>
-
-                        </div>
-
-                        <p class="route-note">
-                            Routes are driving estimates.
-                            Some Palawan attractions require
-                            boat travel and may not have
-                            a connected road route.
-                        </p>
-
-                    </div>
-
-                    <a
-                        id="directions-link"
-                        href="#"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        class="map-directions"
-                    >
-                        Open in OpenStreetMap ↗
-                    </a>
-
+                <div class="weather-item">
+                    <small>Wind Speed</small>
+                    <strong>{{ weather.wind_speed }} km/h</strong>
                 </div>
 
             </div>
 
-            <!-- DESTINATION OVERVIEW -->
-            <aside class="detail-sidebar">
+            <p class="weather-note">
+                Precipitation: {{ weather.precipitation }} mm
 
-                <span class="eyebrow">
-                    DESTINATION OVERVIEW
+                {% if weather.updated_at %}
+                    · Updated: {{ weather.updated_at }}
+                {% endif %}
+            </p>
+
+        {% else %}
+            <p>
+                Weather information is currently unavailable.
+            </p>
+        {% endif %}
+    </section>
+
+    <!-- DESTINATION MAP -->
+
+    <section class="spot-section">
+        <h2>Destination Map</h2>
+
+        <p class="spot-description">
+            View the destination on the map.
+            Click another location to select your starting point.
+        </p>
+
+        <div id="destination-map"></div>
+
+        <!-- ROUTE PLANNER -->
+
+        <div class="route-panel">
+            <h3>Plan Your Driving Route</h3>
+
+            <p>
+                Click anywhere on the map to choose
+                your starting location.
+            </p>
+
+            <div class="route-start">
+                <strong>Starting Location:</strong>
+                <span id="starting-location">
+                    Not selected
                 </span>
+            </div>
 
-                <div class="overview-row">
-                    <span>Category</span>
-                    <strong>{{ spot.category.name }}</strong>
-                </div>
+            <button
+                type="button"
+                id="find-route-button"
+                class="route-button"
+                disabled
+            >
+                Find Route
+            </button>
 
-                <div class="overview-row">
-                    <span>Location</span>
-                    <strong>{{ spot.location.name }}</strong>
-                </div>
+            <div
+                id="route-status"
+                class="route-status"
+                aria-live="polite"
+            ></div>
 
-                <div class="overview-row">
-                    <span>Average Rating</span>
+            <div
+                id="route-result"
+                class="route-result"
+                aria-live="polite"
+            ></div>
 
+            <p class="route-note">
+                Driving directions are available only where
+                connected roads exist. Island destinations
+                may require boat travel.
+            </p>
+        </div>
+    </section>
+
+    <!-- VISITOR REVIEWS -->
+
+    <section class="spot-section" id="reviews">
+        <h2>Visitor Reviews</h2>
+
+        <p class="review-summary">
+            {% if average_rating %}
+                Average Rating:
+                {{ average_rating|floatformat:1 }} / 5
+                · {{ reviews|length }} rating(s)
+            {% else %}
+                No ratings yet.
+            {% endif %}
+        </p>
+
+        {% for review in reviews %}
+
+            <div class="review-card">
+
+                <div class="review-heading">
                     <strong>
-                        {% if average_rating %}
-                            ⭐ {{ average_rating|floatformat:1 }}/5
-                        {% else %}
-                            No ratings yet
-                        {% endif %}
+                        {{ review.visitor.name }}
                     </strong>
+
+                    <span class="review-date">
+                        {{ review.created_at|date:"M d, Y" }}
+                    </span>
                 </div>
 
-                <div class="overview-row">
-                    <span>Reviews</span>
-                    <strong>{{ reviews.count }}</strong>
+                <div class="review-stars">
+                    {% if review.rating == 1 %}
+                        ★☆☆☆☆
+                    {% elif review.rating == 2 %}
+                        ★★☆☆☆
+                    {% elif review.rating == 3 %}
+                        ★★★☆☆
+                    {% elif review.rating == 4 %}
+                        ★★★★☆
+                    {% elif review.rating == 5 %}
+                        ★★★★★
+                    {% endif %}
                 </div>
 
-            </aside>
-
-        </div>
-
-        <!-- REVIEWS -->
-        <div class="reviews-section">
-
-            <span class="eyebrow">
-                TRAVELER EXPERIENCES
-            </span>
-
-            <h2>Visitor Reviews</h2>
-
-            {% for review in reviews %}
-
-                <div class="review-card">
-
-                    <div class="review-top">
-                        <strong>
-                            {{ review.visitor.name }}
-                        </strong>
-
-                        <span>
-                            ⭐ {{ review.rating }}/5
-                        </span>
+                {% if review.comment %}
+                    <div class="review-comment">
+                        {{ review.comment }}
                     </div>
+                {% endif %}
 
-                    <p>{{ review.comment }}</p>
+            </div>
+
+        {% empty %}
+
+            <p>
+                No ratings yet.
+                Be the first to rate this destination!
+            </p>
+
+        {% endfor %}
+    </section>
+
+    <!-- VISITOR RATING FORM -->
+
+    <section
+        class="visitor-review-section"
+        id="write-review"
+    >
+
+        {% if review_submitted %}
+
+            <div class="review-success">
+                <h2>Rating Submitted Successfully!</h2>
+
+                <p>
+                    Thank you for rating this destination!
+                    Your rating is now visible in the
+                    Visitor Reviews section.
+                </p>
+            </div>
+
+        {% else %}
+
+            <h2>Rate Your Experience</h2>
+
+            <p>
+                Visited this destination?
+                Give it a star rating.
+                Writing a review is optional.
+            </p>
+
+            {% if review_form.non_field_errors %}
+                <div class="review-error">
+                    {{ review_form.non_field_errors }}
+                </div>
+            {% endif %}
+
+            <form
+                method="POST"
+                action="{% url 'spot_detail' spot.pk %}#write-review"
+                class="visitor-review-form"
+            >
+                {% csrf_token %}
+
+                <!-- NAME -->
+
+                <label for="{{ review_form.name.id_for_label }}">
+                    Your Name *
+                </label>
+
+                {{ review_form.name }}
+                {{ review_form.name.errors }}
+
+                <!-- EMAIL -->
+
+                <label for="{{ review_form.email.id_for_label }}">
+                    Email Address *
+                </label>
+
+                {{ review_form.email }}
+                {{ review_form.email.errors }}
+
+                <!-- STAR RATING -->
+
+                <label id="rating-label">
+                    Your Rating *
+                </label>
+
+                <div
+                    class="star-rating"
+                    role="radiogroup"
+                    aria-labelledby="rating-label"
+                >
+
+                    <input
+                        type="radio"
+                        name="rating"
+                        id="rating-5"
+                        value="5"
+                        {% if review_form.rating.value == "5" %}checked{% endif %}
+                        required
+                    >
+                    <label for="rating-5" title="5 stars">★</label>
+
+                    <input
+                        type="radio"
+                        name="rating"
+                        id="rating-4"
+                        value="4"
+                        {% if review_form.rating.value == "4" %}checked{% endif %}
+                    >
+                    <label for="rating-4" title="4 stars">★</label>
+
+                    <input
+                        type="radio"
+                        name="rating"
+                        id="rating-3"
+                        value="3"
+                        {% if review_form.rating.value == "3" %}checked{% endif %}
+                    >
+                    <label for="rating-3" title="3 stars">★</label>
+
+                    <input
+                        type="radio"
+                        name="rating"
+                        id="rating-2"
+                        value="2"
+                        {% if review_form.rating.value == "2" %}checked{% endif %}
+                    >
+                    <label for="rating-2" title="2 stars">★</label>
+
+                    <input
+                        type="radio"
+                        name="rating"
+                        id="rating-1"
+                        value="1"
+                        {% if review_form.rating.value == "1" %}checked{% endif %}
+                    >
+                    <label for="rating-1" title="1 star">★</label>
 
                 </div>
 
-            {% empty %}
+                {{ review_form.rating.errors }}
 
-                <p class="no-reviews">
-                    No reviews yet for this destination.
-                </p>
+                <!-- OPTIONAL COMMENT -->
 
-            {% endfor %}
+                <label for="{{ review_form.comment.id_for_label }}">
+                    Write a Review
+                    <span class="review-optional">
+                        (Optional)
+                    </span>
+                </label>
 
-        </div>
+                {{ review_form.comment }}
+                {{ review_form.comment.errors }}
 
-    </div>
-</section>
+                <button
+                    type="submit"
+                    class="review-submit-btn"
+                >
+                    Submit Rating
+                </button>
 
+            </form>
 
-<!-- ROUTE PLANNER STYLING -->
-<style>
+        {% endif %}
 
-.route-panel {
-    margin-top: 24px;
-    padding: 26px;
-    border: 1px solid #e1e9df;
-    border-radius: 20px;
-    background: #ffffff;
-}
+    </section>
 
-.route-panel h3 {
-    margin: 10px 0;
-    color: #214b36;
-}
+</div>
 
-.route-panel p {
-    line-height: 1.7;
-}
+<!-- LEAFLET MAP LIBRARY -->
 
-.route-start {
-    padding: 17px;
-    margin: 20px 0;
-    background: #f5f7f2;
-    border-radius: 13px;
-}
-
-.route-start small,
-.route-result small {
-    display: block;
-    color: #778579;
-    margin-bottom: 7px;
-}
-
-.route-start strong {
-    display: block;
-    color: #214b36;
-    overflow-wrap: anywhere;
-}
-
-.route-button {
-    display: block;
-    width: 100%;
-    border: none;
-    border-radius: 12px;
-    background: #28543c;
-    color: #ffffff;
-    padding: 15px 20px;
-    font: inherit;
-    font-weight: 700;
-    cursor: pointer;
-    transition: background 0.2s;
-}
-
-.route-button:hover:not(:disabled) {
-    background: #1d402e;
-}
-
-.route-button:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
-}
-
-.route-status {
-    margin: 16px 0;
-    color: #66766b;
-}
-
-.route-result {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 12px;
-    margin-top: 18px;
-}
-
-.route-result[hidden] {
-    display: none;
-}
-
-.route-result div {
-    background: #f5f7f2;
-    padding: 18px;
-    border-radius: 12px;
-}
-
-.route-result strong {
-    display: block;
-    font-size: 21px;
-    color: #214b36;
-}
-
-.route-note {
-    font-size: 13px;
-    color: #7b887d;
-    margin-top: 18px;
-}
-
-#destination-map {
-    cursor: crosshair;
-}
-
-@media (max-width: 600px) {
-    .route-panel {
-        padding: 18px;
-    }
-
-    .route-result {
-        grid-template-columns: 1fr;
-    }
-}
-
-</style>
-
-
-<!-- LEAFLET CSS AND JAVASCRIPT -->
 <link
     rel="stylesheet"
     href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
@@ -452,115 +793,43 @@
 
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
+<!-- MAP AND ROUTE JAVASCRIPT -->
 
-<!-- SAFE DJANGO DATA -->
-{{ spot.location.latitude|json_script:"spot-latitude" }}
-{{ spot.location.longitude|json_script:"spot-longitude" }}
-{{ spot.name|json_script:"spot-name" }}
-{{ spot.location.address|json_script:"spot-address" }}
-
-
-<!-- MAP AND ROUTING JAVASCRIPT -->
 <script>
-
 document.addEventListener("DOMContentLoaded", function () {
 
-    // DESTINATION DATA
-    const latitude = Number(
-        JSON.parse(
-            document.getElementById(
-                "spot-latitude"
-            ).textContent
-        )
+    const destinationLatitude = Number(
+        "{{ spot.location.latitude }}"
     );
 
-    const longitude = Number(
-        JSON.parse(
-            document.getElementById(
-                "spot-longitude"
-            ).textContent
-        )
+    const destinationLongitude = Number(
+        "{{ spot.location.longitude }}"
     );
 
-    const spotName = JSON.parse(
-        document.getElementById(
-            "spot-name"
-        ).textContent
-    );
-
-    const spotAddress = JSON.parse(
-        document.getElementById(
-            "spot-address"
-        ).textContent
-    );
-
-    if (
-        !Number.isFinite(latitude) ||
-        !Number.isFinite(longitude)
-    ) {
-        return;
-    }
-
-    // CREATE LEAFLET MAP
     const map = L.map("destination-map").setView(
-        [latitude, longitude],
-        13
+        [destinationLatitude, destinationLongitude],
+        12
     );
 
     L.tileLayer(
         "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
         {
-            attribution:
-                '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+            attribution: "&copy; OpenStreetMap contributors",
             maxZoom: 19
         }
     ).addTo(map);
 
-    // DESTINATION MARKER
-    const popup = document.createElement("div");
+    const destinationMarker = L.marker([
+        destinationLatitude,
+        destinationLongitude
+    ]).addTo(map);
 
-    const title = document.createElement("strong");
-    title.textContent = spotName;
-
-    const address = document.createElement("p");
-    address.textContent = spotAddress;
-
-    popup.appendChild(title);
-    popup.appendChild(address);
-
-    L.marker([latitude, longitude])
-        .addTo(map)
-        .bindPopup(popup)
-        .openPopup();
-
-    // OPENSTREETMAP LINK
-    const directionsLink = document.getElementById(
-        "directions-link"
+    destinationMarker.bindPopup(
+        "{{ spot.name|escapejs }}"
     );
 
-    const osmUrl = new URL(
-        "https://www.openstreetmap.org/directions"
-    );
-
-    osmUrl.searchParams.set(
-        "to",
-        latitude + "," + longitude
-    );
-
-    directionsLink.href = osmUrl.toString();
-
-    // ROUTE VARIABLES
-    let startingPoint = null;
-    let startingMarker = null;
-    let routeLayer = null;
-    let requestInProgress = false;
-
-    const startLocation = document.getElementById(
-        "start-location"
-    );
-
-    const routeForm = document.getElementById(
-        "route-form"
+    const startLocationText = document.getElementById(
+        "starting-location"
     );
 
     const routeButton = document.getElementById(
@@ -575,82 +844,74 @@ document.addEventListener("DOMContentLoaded", function () {
         "route-result"
     );
 
-    const routeDistance = document.getElementById(
-        "route-distance"
-    );
+    let startingCoordinates = null;
+    let startingMarker = null;
+    let routeLayer = null;
 
-    const routeDuration = document.getElementById(
-        "route-duration"
-    );
+    // SELECT STARTING LOCATION
 
-    // SELECT STARTING POINT ON MAP
     map.on("click", function (event) {
 
-        startingPoint = {
+        startingCoordinates = {
             latitude: event.latlng.lat,
             longitude: event.latlng.lng
         };
+
+        startLocationText.textContent =
+            startingCoordinates.latitude.toFixed(5)
+            + ", "
+            + startingCoordinates.longitude.toFixed(5);
 
         if (startingMarker) {
             map.removeLayer(startingMarker);
         }
 
+        startingMarker = L.circleMarker(
+            [
+                startingCoordinates.latitude,
+                startingCoordinates.longitude
+            ],
+            {
+                radius: 9,
+                color: "#167d68",
+                fillColor: "#167d68",
+                fillOpacity: 0.8
+            }
+        ).addTo(map);
+
+        startingMarker.bindPopup("Starting Location");
+
+        routeButton.disabled = false;
+
+        routeStatus.textContent =
+            "Starting location selected. Click Find Route.";
+
+        routeResult.classList.remove("visible");
+        routeResult.textContent = "";
+
         if (routeLayer) {
             map.removeLayer(routeLayer);
             routeLayer = null;
         }
-
-        startingMarker = L.circleMarker(
-            event.latlng,
-            {
-                radius: 9,
-                color: "#28543c",
-                fillColor: "#82a982",
-                fillOpacity: 1
-            }
-        ).addTo(map);
-
-        startingMarker.bindPopup(
-            "Your selected starting point"
-        );
-
-        startLocation.textContent =
-            startingPoint.latitude.toFixed(5) +
-            ", " +
-            startingPoint.longitude.toFixed(5);
-
-        routeButton.disabled = requestInProgress;
-
-        routeResult.hidden = true;
-
-        routeStatus.textContent =
-            "Starting point selected. Click Find Route.";
-
     });
 
-    // CALCULATE ROUTE
-    routeForm.addEventListener(
-        "submit",
-        async function (event) {
+    // CALCULATE DRIVING ROUTE
 
-            event.preventDefault();
+    routeButton.addEventListener(
+        "click",
+        async function () {
 
-            if (!startingPoint || requestInProgress) {
+            if (!startingCoordinates) {
                 return;
             }
 
-            requestInProgress = true;
             routeButton.disabled = true;
-            routeButton.textContent = "Calculating...";
-
-            routeResult.hidden = true;
 
             routeStatus.textContent =
-                "Calculating your driving route...";
+                "Calculating driving route...";
 
-            const selectedPoint = {
-                ...startingPoint
-            };
+            routeResult.classList.remove("visible");
+            routeResult.textContent = "";
 
             try {
 
@@ -660,14 +921,10 @@ document.addEventListener("DOMContentLoaded", function () {
                         method: "POST",
                         headers: {
                             "Content-Type": "application/json",
-                            "X-CSRFToken":
-                                routeForm.querySelector(
-                                    "[name=csrfmiddlewaretoken]"
-                                ).value
+                            "X-CSRFToken": "{{ csrf_token }}"
                         },
-                        body: JSON.stringify(
-                            selectedPoint
-                        )
+                        credentials: "same-origin",
+                        body: JSON.stringify(startingCoordinates)
                     }
                 );
 
@@ -675,62 +932,42 @@ document.addEventListener("DOMContentLoaded", function () {
 
                 if (!response.ok) {
                     throw new Error(
-                        data.error ||
-                        "Unable to calculate route."
+                        data.error || "Unable to calculate route."
                     );
                 }
 
-                // IGNORE OLD RESULT IF START CHANGED
-                if (
-                    !startingPoint ||
-                    startingPoint.latitude !==
-                        selectedPoint.latitude ||
-                    startingPoint.longitude !==
-                        selectedPoint.longitude
-                ) {
-                    routeStatus.textContent =
-                        "Starting point changed. " +
-                        "Please calculate again.";
-                    return;
-                }
-
-                // REMOVE PREVIOUS ROUTE
                 if (routeLayer) {
                     map.removeLayer(routeLayer);
                 }
 
-                // DRAW NEW ROUTE
                 routeLayer = L.geoJSON(
-                    {
-                        type: "Feature",
-                        geometry: data.geometry,
-                        properties: {}
-                    },
+                    data.geometry,
                     {
                         style: {
-                            color: "#28543c",
+                            color: "#167d68",
                             weight: 5,
                             opacity: 0.9
                         }
                     }
                 ).addTo(map);
 
-                // FIT ROUTE ON MAP
-                map.fitBounds(
-                    routeLayer.getBounds(),
-                    {
-                        padding: [35, 35]
-                    }
-                );
+                const bounds = routeLayer.getBounds();
 
-                // DISPLAY DISTANCE AND TIME
-                routeDistance.textContent =
-                    data.distance_km + " km";
+                if (bounds.isValid()) {
+                    map.fitBounds(
+                        bounds,
+                        { padding: [35, 35] }
+                    );
+                }
 
-                routeDuration.textContent =
-                    data.duration_minutes + " min";
+                routeResult.textContent =
+                    "Distance: "
+                    + data.distance_km
+                    + " km | Estimated driving time: "
+                    + data.duration_minutes
+                    + " minutes";
 
-                routeResult.hidden = false;
+                routeResult.classList.add("visible");
 
                 routeStatus.textContent =
                     "Driving route calculated successfully.";
@@ -738,20 +975,107 @@ document.addEventListener("DOMContentLoaded", function () {
             } catch (error) {
 
                 routeStatus.textContent =
-                    error.message;
+                    error.message || "Unable to calculate route.";
 
             } finally {
-
-                requestInProgress = false;
-                routeButton.disabled = !startingPoint;
-                routeButton.textContent = "Find Route";
-
+                routeButton.disabled = false;
             }
         }
     );
-
 });
+</script>
 
+<!-- FAVORITES JAVASCRIPT -->
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+
+    const button = document.getElementById(
+        "spot-favorite-button"
+    );
+
+    const feedback = document.getElementById(
+        "favorite-feedback"
+    );
+
+    const spotId = "{{ spot.pk }}";
+    const storageKey = "galago_favorites";
+
+    if (!button) {
+        return;
+    }
+
+    function getFavorites() {
+        try {
+            const stored = localStorage.getItem(storageKey);
+            const parsed = stored ? JSON.parse(stored) : [];
+
+            return Array.isArray(parsed)
+                ? parsed.map(String)
+                : [];
+
+        } catch (error) {
+            return [];
+        }
+    }
+
+    function updateButton() {
+
+        const saved = getFavorites().includes(spotId);
+
+        button.classList.toggle("is-favorite", saved);
+        button.setAttribute("aria-pressed", String(saved));
+
+        button.querySelector(".heart").textContent =
+            saved ? "♥" : "♡";
+
+        button.querySelector(".favorite-label").textContent =
+            saved ? "Saved to Favorites" : "Save to Favorites";
+
+        button.title = saved
+            ? "Remove from Favorites"
+            : "Save to Favorites";
+    }
+
+    button.addEventListener("click", function () {
+
+        const favorites = getFavorites();
+        const wasSaved = favorites.includes(spotId);
+
+        const updated = wasSaved
+            ? favorites.filter(function (id) {
+                return id !== spotId;
+            })
+            : [...favorites, spotId];
+
+        try {
+
+            localStorage.setItem(
+                storageKey,
+                JSON.stringify(updated)
+            );
+
+            updateButton();
+
+            feedback.textContent = wasSaved
+                ? "Removed from your favorites."
+                : "Added to your favorites!";
+
+        } catch (error) {
+
+            feedback.textContent =
+                "Unable to save favorites in this browser.";
+        }
+    });
+
+    window.addEventListener("storage", function (event) {
+        if (event.key === storageKey) {
+            updateButton();
+        }
+    });
+
+    updateButton();
+});
 </script>
 
 {% endblock %}

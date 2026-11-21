@@ -9,9 +9,7 @@
         content="width=device-width, initial-scale=1"
     >
 
-    <title>
-        {% block title %}GalaGo{% endblock %}
-    </title>
+    <title>{% block title %}GalaGo{% endblock %}</title>
 
     <link
         href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Outfit:wght@400;500;600;700;800&display=swap"
@@ -22,30 +20,68 @@
         rel="stylesheet"
         href="{% static 'css/style.css' %}"
     >
+
+    <style>
+        .header .desktop-nav {
+            display: flex;
+            align-items: center;
+            gap: 32px;
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+        }
+
+        .header-actions .nav-button {
+            white-space: nowrap;
+        }
+
+        @media (max-width: 768px) {
+            .header-actions {
+                display: none;
+            }
+        }
+    </style>
 </head>
 
 <body>
 
 <header class="header">
     <div class="container header-inner">
+
         <a href="{% url 'home' %}" class="logo">
             Gala<span>Go.</span>
         </a>
 
         <nav class="desktop-nav">
-            <a href="{% url 'home' %}">Explore</a>
+            <a href="{% url 'home' %}">
+                Explore
+            </a>
+
             <a href="{% url 'home' %}#destinations">
                 Destinations
             </a>
+
+            <a href="{% url 'favorites' %}">
+                ♡ Favorites
+            </a>
+
             <a href="{% url 'home' %}#about">
                 About
             </a>
         </nav>
 
-        <a href="{% url 'home' %}#destinations"
-           class="nav-button">
-            Explore Palawan ↗
-        </a>
+        <div class="header-actions">
+            <a
+                href="{% url 'home' %}#destinations"
+                class="nav-button"
+            >
+                Explore Palawan ↗
+            </a>
+        </div>
+
     </div>
 </header>
 
@@ -56,8 +92,10 @@
 
 <footer class="footer" id="about">
     <div class="container footer-inner">
+
         <div>
             <h2>GalaGo.</h2>
+
             <p>
                 Discover beautiful places and
                 unforgettable experiences in Palawan.
@@ -67,10 +105,12 @@
         <p class="footer-note">
             Made for Palawan explorers.
         </p>
+
     </div>
 </footer>
 
 <nav class="mobile-nav">
+
     <a href="{% url 'home' %}">
         <span>⌂</span>
         <small>Home</small>
@@ -81,10 +121,16 @@
         <small>Explore</small>
     </a>
 
-    <a href="{% url 'home' %}#about">
+    <a href="{% url 'favorites' %}">
         <span>♡</span>
+        <small>Favorites</small>
+    </a>
+
+    <a href="{% url 'home' %}#about">
+        <span>☷</span>
         <small>About</small>
     </a>
+
 </nav>
 
 </body>

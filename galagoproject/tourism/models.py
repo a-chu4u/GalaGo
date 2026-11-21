@@ -68,7 +68,7 @@ class Review(models.Model):
     rating = models.PositiveSmallIntegerField(
         choices=[(i, str(i)) for i in range(1, 6)]
     )
-    comment = models.TextField()
+    comment = models.TextField(blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):

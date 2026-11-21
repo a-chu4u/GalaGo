@@ -893,3 +893,85 @@ h1, h2, h3, .logo {
         font-size: 38px;
     }
 }
+
+
+/* Visitor review form */
+
+.visitor-review-section {
+    margin: 40px 0;
+    padding: 32px;
+    background: #ffffff;
+    border: 1px solid #e5ebe7;
+    border-radius: 18px;
+}
+
+.visitor-review-section h2 {
+    margin-bottom: 10px;
+    color: #244b38;
+}
+
+.visitor-review-section p {
+    color: #66736c;
+    margin-bottom: 24px;
+}
+
+.visitor-review-form {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.visitor-review-form label {
+    font-weight: 600;
+    color: #244b38;
+}
+
+.review-input {
+    width: 100%;
+    padding: 13px 15px;
+    border: 1px solid #d5ded8;
+    border-radius: 9px;
+    font: inherit;
+    box-sizing: border-box;
+}
+
+.review-input:focus {
+    outline: none;
+    border-color: #167d68;
+}
+
+.review-submit-btn {
+    margin-top: 12px;
+    padding: 14px 22px;
+    background: #244b38;
+    color: white;
+    border: none;
+    border-radius: 9px;
+    font: inherit;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.review-submit-btn:hover {
+    background: #167d68;
+}
+
+.review-success {
+    background: #e6f4eb;
+    color: #226b43;
+    padding: 14px;
+    border-radius: 9px;
+    margin-bottom: 20px;
+}
+
+.review-error,
+.visitor-review-form .errorlist {
+    color: #b42318;
+    font-size: 13px;
+}
+
+@media (max-width: 768px) {
+    .visitor-review-section {
+        padding: 22px;
+    }
+}
