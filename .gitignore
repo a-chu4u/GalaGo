@@ -1,0 +1,62 @@
+
+# ==========================================
+# GalaGo Django Project - .gitignore
+# ==========================================
+
+# Environment variables and secret keys
+.env
+.env.*
+!.env.example
+
+# SQLite database
+db.sqlite3
+db.sqlite3-journal
+*.sqlite3
+
+# Python cache and compiled files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual environments
+galaenv/
+venv/
+.venv/
+env/
+
+# Python packaging
+*.egg-info/
+build/
+dist/
+.eggs/
+
+# Django generated files
+staticfiles/
+*.log
+
+# Uploaded media files
+media/
+
+# Testing and coverage
+.pytest_cache/
+.coverage
+htmlcov/
+.tox/
+.mypy_cache/
+.ruff_cache/
+
+# IDE and editor settings
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Operating system files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Temporary and backup files
+*.tmp
+*.bak
+*~
