@@ -40,6 +40,7 @@
 
         <div class="detail-grid">
             <div class="detail-main">
+
                 <h2>About this destination</h2>
 
                 <p class="detail-description">
@@ -66,34 +67,52 @@
                     </div>
                 </div>
 
-                <div class="map-placeholder">
-                    <span>📍</span>
-                    <h3>Interactive Map</h3>
+                <div class="map-section">
+                    <h3>Explore on the map</h3>
+
                     <p>
-                        Leaflet and OpenStreetMap
-                        integration will be added
-                        in the next development steps.
+                        Find the destination and explore
+                        the surrounding area.
                     </p>
+
+                    <div id="destination-map"></div>
+
+                    <a
+                        id="directions-link"
+                        href="#"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        class="map-directions"
+                    >
+                        Open in OpenStreetMap ↗
+                    </a>
                 </div>
+
             </div>
 
             <aside class="detail-sidebar">
+
                 <span class="eyebrow">
                     DESTINATION OVERVIEW
                 </span>
 
                 <div class="overview-row">
                     <span>Category</span>
-                    <strong>{{ spot.category.name }}</strong>
+                    <strong>
+                        {{ spot.category.name }}
+                    </strong>
                 </div>
 
                 <div class="overview-row">
                     <span>Location</span>
-                    <strong>{{ spot.location.name }}</strong>
+                    <strong>
+                        {{ spot.location.name }}
+                    </strong>
                 </div>
 
                 <div class="overview-row">
                     <span>Average Rating</span>
+
                     <strong>
                         {% if average_rating %}
                             ⭐ {{ average_rating|floatformat:1 }}/5
@@ -107,10 +126,12 @@
                     <span>Reviews</span>
                     <strong>{{ reviews.count }}</strong>
                 </div>
+
             </aside>
         </div>
 
         <div class="reviews-section">
+
             <span class="eyebrow">
                 TRAVELER EXPERIENCES
             </span>
@@ -119,21 +140,120 @@
 
             {% for review in reviews %}
                 <div class="review-card">
+
                     <div class="review-top">
-                        <strong>{{ review.visitor.name }}</strong>
-                        <span>⭐ {{ review.rating }}/5</span>
+                        <strong>
+                            {{ review.visitor.name }}
+                        </strong>
+
+                        <span>
+                            ⭐ {{ review.rating }}/5
+                        </span>
                     </div>
 
                     <p>{{ review.comment }}</p>
+
                 </div>
+
             {% empty %}
                 <p class="no-reviews">
                     No reviews yet for this destination.
                 </p>
             {% endfor %}
+
         </div>
 
     </div>
 </section>
+
+<!-- Leaflet CSS -->
+<link
+    rel="stylesheet"
+    href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+/>
+
+<!-- Leaflet JavaScript -->
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+<!-- Destination coordinates from Django -->
+{{ spot.location.latitude|json_script:"spot-latitude" }}
+{{ spot.location.longitude|json_script:"spot-longitude" }}
+{{ spot.name|json_script:"spot-name" }}
+{{ spot.location.address|json_script:"spot-address" }}
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+
+    const latitude = Number(
+        JSON.parse(
+            document.getElementById("spot-latitude").textContent
+        )
+    );
+
+    const longitude = Number(
+        JSON.parse(
+            document.getElementById("spot-longitude").textContent
+        )
+    );
+
+    const spotName = JSON.parse(
+        document.getElementById("spot-name").textContent
+    );
+
+    const spotAddress = JSON.parse(
+        document.getElementById("spot-address").textContent
+    );
+
+    if (!Number.isFinite(latitude) ||
+        !Number.isFinite(longitude)) {
+        return;
+    }
+
+    const map = L.map("destination-map").setView(
+        [latitude, longitude],
+        14
+    );
+
+    L.tileLayer(
+        "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+        {
+            attribution:
+                '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+            maxZoom: 19
+        }
+    ).addTo(map);
+
+    const popup = document.createElement("div");
+    const title = document.createElement("strong");
+    const address = document.createElement("p");
+
+    title.textContent = spotName;
+    address.textContent = spotAddress;
+
+    popup.appendChild(title);
+    popup.appendChild(address);
+
+    L.marker([latitude, longitude])
+        .addTo(map)
+        .bindPopup(popup)
+        .openPopup();
+
+    const directionsLink = document.getElementById(
+        "directions-link"
+    );
+
+    const url = new URL(
+        "https://www.openstreetmap.org/directions"
+    );
+
+    url.searchParams.set(
+        "to",
+        latitude + "," + longitude
+    );
+
+    directionsLink.href = url.toString();
+
+});
+</script>
 
 {% endblock %}
