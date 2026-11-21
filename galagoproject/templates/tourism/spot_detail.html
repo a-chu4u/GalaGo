@@ -19,9 +19,7 @@
 
             <h1>{{ spot.name }}</h1>
 
-            <p>
-                📍 {{ spot.location.address }}
-            </p>
+            <p>📍 {{ spot.location.address }}</p>
         </div>
 
         <div class="detail-image">
@@ -47,6 +45,67 @@
                     {{ spot.description }}
                 </p>
 
+                <h2>Current Weather</h2>
+
+                <div class="weather-card">
+                    {% if weather %}
+                        <div class="weather-heading">
+                            <div>
+                                <span class="eyebrow">
+                                    LIVE WEATHER DATA
+                                </span>
+
+                                <h3>{{ weather.description }}</h3>
+                            </div>
+
+                            <div class="weather-temperature">
+                                {{ weather.temperature|floatformat:0 }}°C
+                            </div>
+                        </div>
+
+                        <div class="weather-grid">
+                            <div>
+                                <small>Feels Like</small>
+                                <strong>
+                                    {{ weather.feels_like|floatformat:0 }}°C
+                                </strong>
+                            </div>
+
+                            <div>
+                                <small>Humidity</small>
+                                <strong>
+                                    {{ weather.humidity }}%
+                                </strong>
+                            </div>
+
+                            <div>
+                                <small>Wind Speed</small>
+                                <strong>
+                                    {{ weather.wind_speed }} km/h
+                                </strong>
+                            </div>
+
+                            <div>
+                                <small>Precipitation</small>
+                                <strong>
+                                    {{ weather.precipitation }} mm
+                                </strong>
+                            </div>
+                        </div>
+
+                        <p class="weather-note">
+                            Weather data provided by Open-Meteo.
+                            Updated: {{ weather.updated_at }}
+                            (Philippine time)
+                        </p>
+                    {% else %}
+                        <p class="weather-unavailable">
+                            Weather information is temporarily unavailable.
+                            Please try again later.
+                        </p>
+                    {% endif %}
+                </div>
+
                 <h2>Where to find it</h2>
 
                 <p>{{ spot.location.address }}</p>
@@ -54,16 +113,12 @@
                 <div class="coordinates">
                     <div>
                         <small>Latitude</small>
-                        <strong>
-                            {{ spot.location.latitude }}
-                        </strong>
+                        <strong>{{ spot.location.latitude }}</strong>
                     </div>
 
                     <div>
                         <small>Longitude</small>
-                        <strong>
-                            {{ spot.location.longitude }}
-                        </strong>
+                        <strong>{{ spot.location.longitude }}</strong>
                     </div>
                 </div>
 
@@ -71,7 +126,7 @@
                     <h3>Explore on the map</h3>
 
                     <p>
-                        Find the destination and explore
+                        Find this destination and explore
                         the surrounding area.
                     </p>
 
@@ -87,32 +142,25 @@
                         Open in OpenStreetMap ↗
                     </a>
                 </div>
-
             </div>
 
             <aside class="detail-sidebar">
-
                 <span class="eyebrow">
                     DESTINATION OVERVIEW
                 </span>
 
                 <div class="overview-row">
                     <span>Category</span>
-                    <strong>
-                        {{ spot.category.name }}
-                    </strong>
+                    <strong>{{ spot.category.name }}</strong>
                 </div>
 
                 <div class="overview-row">
                     <span>Location</span>
-                    <strong>
-                        {{ spot.location.name }}
-                    </strong>
+                    <strong>{{ spot.location.name }}</strong>
                 </div>
 
                 <div class="overview-row">
                     <span>Average Rating</span>
-
                     <strong>
                         {% if average_rating %}
                             ⭐ {{ average_rating|floatformat:1 }}/5
@@ -126,12 +174,10 @@
                     <span>Reviews</span>
                     <strong>{{ reviews.count }}</strong>
                 </div>
-
             </aside>
         </div>
 
         <div class="reviews-section">
-
             <span class="eyebrow">
                 TRAVELER EXPERIENCES
             </span>
@@ -140,42 +186,29 @@
 
             {% for review in reviews %}
                 <div class="review-card">
-
                     <div class="review-top">
-                        <strong>
-                            {{ review.visitor.name }}
-                        </strong>
-
-                        <span>
-                            ⭐ {{ review.rating }}/5
-                        </span>
+                        <strong>{{ review.visitor.name }}</strong>
+                        <span>⭐ {{ review.rating }}/5</span>
                     </div>
 
                     <p>{{ review.comment }}</p>
-
                 </div>
-
             {% empty %}
                 <p class="no-reviews">
                     No reviews yet for this destination.
                 </p>
             {% endfor %}
-
         </div>
-
     </div>
 </section>
 
-<!-- Leaflet CSS -->
 <link
     rel="stylesheet"
     href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
-/>
+>
 
-<!-- Leaflet JavaScript -->
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
-<!-- Destination coordinates from Django -->
 {{ spot.location.latitude|json_script:"spot-latitude" }}
 {{ spot.location.longitude|json_script:"spot-longitude" }}
 {{ spot.name|json_script:"spot-name" }}
