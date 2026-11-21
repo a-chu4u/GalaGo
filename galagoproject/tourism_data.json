@@ -40,6 +40,30 @@
   }
 },
 {
+  "model": "tourism.category",
+  "pk": 6,
+  "fields": {
+    "name": "Recreation",
+    "description": ""
+  }
+},
+{
+  "model": "tourism.category",
+  "pk": 7,
+  "fields": {
+    "name": "Viewpoint",
+    "description": ""
+  }
+},
+{
+  "model": "tourism.category",
+  "pk": 8,
+  "fields": {
+    "name": "Ecotourism",
+    "description": ""
+  }
+},
+{
   "model": "tourism.location",
   "pk": 1,
   "fields": {
@@ -167,6 +191,66 @@
     "address": "Barangay Port Barton, San Vicente, Palawan, Philippines",
     "latitude": "10.4135000",
     "longitude": "119.1780000"
+  }
+},
+{
+  "model": "tourism.location",
+  "pk": 14,
+  "fields": {
+    "name": "Baker's Hill",
+    "address": "Mitra Road, Barangay Sta. Monica, Puerto Princesa City, Palawan, Philippines",
+    "latitude": "9.8075970",
+    "longitude": "118.7342970"
+  }
+},
+{
+  "model": "tourism.location",
+  "pk": 15,
+  "fields": {
+    "name": "Mitra's Ranch",
+    "address": "Mitra Road, Barangay Sta. Monica, Puerto Princesa City, Palawan, Philippines",
+    "latitude": "9.8116530",
+    "longitude": "118.7353440"
+  }
+},
+{
+  "model": "tourism.location",
+  "pk": 16,
+  "fields": {
+    "name": "Puerto Princesa Baywalk",
+    "address": "Sandoval Street, Puerto Princesa City, Palawan, Philippines",
+    "latitude": "9.7438970",
+    "longitude": "118.7332390"
+  }
+},
+{
+  "model": "tourism.location",
+  "pk": 17,
+  "fields": {
+    "name": "Palawan Butterfly Ecological Garden and Tribal Village",
+    "address": "Butterfly Garden, Sta. Monica, Puerto Princesa City, Palawan, Philippines",
+    "latitude": "9.7951170",
+    "longitude": "118.7324330"
+  }
+},
+{
+  "model": "tourism.location",
+  "pk": 18,
+  "fields": {
+    "name": "Iwahig Firefly Watching",
+    "address": "Barangay Iwahig, Puerto Princesa City, Palawan, Philippines",
+    "latitude": "9.7335970",
+    "longitude": "118.6839250"
+  }
+},
+{
+  "model": "tourism.location",
+  "pk": 19,
+  "fields": {
+    "name": "Binuatan Creations",
+    "address": "Employees Village, Barangay Sta. Monica, Puerto Princesa City, Palawan,",
+    "latitude": "9.7890750",
+    "longitude": "118.7333060"
   }
 },
 {
@@ -326,98 +410,63 @@
   }
 },
 {
-  "model": "tourism.visitor",
-  "pk": 1,
+  "model": "tourism.touristspot",
+  "pk": 14,
   "fields": {
-    "name": "Loki",
-    "email": "loki@gmail.com"
+    "name": "Baker's Hill",
+    "description": "Baker's Hill is a popular tourist attraction known for its beautiful gardens, colorful decorations, and delicious pastries. Visitors can enjoy taking pictures, relaxing with family, and buying local treats and souvenirs.",
+    "category": 6,
+    "location": 14,
+    "image": "tourist_spots/Bakers_Hill.jpg",
+    "created_at": "2026-11-21T16:55:11.017Z"
   }
 },
 {
-  "model": "tourism.visitor",
-  "pk": 2,
+  "model": "tourism.touristspot",
+  "pk": 15,
   "fields": {
-    "name": "Noir",
-    "email": "noir@gmail.com"
+    "name": "Mitra's Ranch",
+    "description": "Mitra's Ranch is a hilltop destination offering beautiful views of Puerto Princesa City, Honda Bay, and the surrounding mountains. It is a great place for sightseeing, photography, and outdoor activities.",
+    "category": 7,
+    "location": 15,
+    "image": "tourist_spots/Mitra.png",
+    "created_at": "2026-11-21T16:57:38.340Z"
   }
 },
 {
-  "model": "tourism.visitor",
-  "pk": 3,
+  "model": "tourism.touristspot",
+  "pk": 16,
   "fields": {
-    "name": "Toffee",
-    "email": "toffe@gmail.com"
+    "name": "Puerto Princesa Baywalk",
+    "description": "Puerto Princesa Baywalk is a waterfront promenade where visitors can enjoy the sea breeze, walk along the bay, and spend time with family and friends. It is especially popular in the evening because of its relaxing atmosphere and nearby food stalls.",
+    "category": 6,
+    "location": 16,
+    "image": "tourist_spots/Baybay.jpg",
+    "created_at": "2026-11-21T17:02:56.785Z"
   }
 },
 {
-  "model": "tourism.visitor",
-  "pk": 4,
+  "model": "tourism.touristspot",
+  "pk": 17,
   "fields": {
-    "name": "Mallows",
-    "email": "mallowieee@gmail.com"
+    "name": "Palawan Butterfly Ecological Garden and Tribal Village",
+    "description": "This attraction features different species of butterflies, insects, and other small wildlife. Visitors can learn about Palawan's biodiversity and discover local cultural traditions through educational exhibits.",
+    "category": 5,
+    "location": 17,
+    "image": "tourist_spots/Butterfly_Garden.jpg",
+    "created_at": "2026-11-21T17:03:19.267Z"
   }
 },
 {
-  "model": "tourism.visitor",
-  "pk": 5,
+  "model": "tourism.touristspot",
+  "pk": 18,
   "fields": {
-    "name": "meow",
-    "email": "meowwy@gmail.com"
-  }
-},
-{
-  "model": "tourism.review",
-  "pk": 1,
-  "fields": {
-    "tourist_spot": 1,
-    "visitor": 1,
-    "rating": 4,
-    "comment": "I love the view!!!",
-    "created_at": "2026-11-21T06:29:35.751Z"
-  }
-},
-{
-  "model": "tourism.review",
-  "pk": 2,
-  "fields": {
-    "tourist_spot": 1,
-    "visitor": 2,
-    "rating": 5,
-    "comment": "I love the place!! Staffs we're really assistive <3",
-    "created_at": "2026-11-21T06:37:06.193Z"
-  }
-},
-{
-  "model": "tourism.review",
-  "pk": 3,
-  "fields": {
-    "tourist_spot": 1,
-    "visitor": 3,
-    "rating": 5,
-    "comment": "YASSS!",
-    "created_at": "2026-11-21T06:38:30.983Z"
-  }
-},
-{
-  "model": "tourism.review",
-  "pk": 4,
-  "fields": {
-    "tourist_spot": 1,
-    "visitor": 4,
-    "rating": 5,
-    "comment": "Love it!",
-    "created_at": "2026-11-21T06:39:53.095Z"
-  }
-},
-{
-  "model": "tourism.review",
-  "pk": 5,
-  "fields": {
-    "tourist_spot": 12,
-    "visitor": 5,
-    "rating": 5,
-    "comment": "",
-    "created_at": "2026-11-21T06:49:26.257Z"
+    "name": "Binuatan Creations",
+    "description": "Binuatan Creations is a local handicraft center where visitors can learn about traditional weaving techniques. Tourists can watch artisans create colorful woven products and purchase locally made souvenirs.",
+    "category": 6,
+    "location": 19,
+    "image": "tourist_spots/Binuatan.png",
+    "created_at": "2026-11-21T17:03:42.539Z"
   }
 }
 ]
