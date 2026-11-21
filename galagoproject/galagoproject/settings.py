@@ -9,20 +9,31 @@ from pathlib import Path
 from dotenv import load_dotenv
 
 
-
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 load_dotenv(BASE_DIR / ".env")
-# Development settings
-# Set DJANGO_SECRET_KEY in your environment.
+
+
+# Security settings
+
 SECRET_KEY = os.environ.get(
     "DJANGO_SECRET_KEY",
     "django-insecure-local-development-only-change-before-deployment"
 )
 
-DEBUG = True
+DEBUG = os.environ.get(
+    "DJANGO_DEBUG",
+    "True"
+).lower() == "true"
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = [
+    host.strip()
+    for host in os.environ.get(
+        "DJANGO_ALLOWED_HOSTS",
+        "127.0.0.1,localhost"
+    ).split(",")
+    if host.strip()
+]
 
 
 # Application definition
@@ -56,7 +67,9 @@ ROOT_URLCONF = "galagoproject.urls"
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
-        "DIRS": [BASE_DIR / "templates"],
+        "DIRS": [
+            BASE_DIR / "templates"
+        ],
         "APP_DIRS": True,
         "OPTIONS": {
             "context_processors": [
@@ -110,7 +123,7 @@ USE_I18N = True
 USE_TZ = True
 
 
-# Static files (CSS, JavaScript)
+# Static files
 
 STATIC_URL = "static/"
 
@@ -118,8 +131,10 @@ STATICFILES_DIRS = [
     BASE_DIR / "static",
 ]
 
+STATIC_ROOT = BASE_DIR / "staticfiles"
 
-# Media files (uploaded tourist spot images)
+
+# Media files
 
 MEDIA_URL = "media/"
 
@@ -133,8 +148,6 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 # Email configuration
 
-MAILERS = {
-    "default": {
-        "BACKEND": "django.core.mail.backends.console.EmailBackend",
-    },
-}
+EMAIL_BACKEND = (
+    "django.core.mail.backends.console.EmailBackend"
+)

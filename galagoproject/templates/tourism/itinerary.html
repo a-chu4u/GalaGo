@@ -1,0 +1,367 @@
+
+{% extends "base.html" %}
+
+{% block title %}My Itinerary | GalaGo{% endblock %}
+
+{% block content %}
+
+<style>
+    .planner-page {
+        max-width: 1100px;
+        margin: 0 auto;
+        padding: 45px 22px 90px;
+    }
+
+    .planner-heading {
+        margin-bottom: 30px;
+    }
+
+    .planner-heading h1 {
+        font-size: clamp(30px, 4vw, 44px);
+        color: #244b38;
+        margin-bottom: 10px;
+    }
+
+    .planner-heading p {
+        color: #65766b;
+        line-height: 1.7;
+    }
+
+    .planner-layout {
+        display: grid;
+        grid-template-columns: 360px minmax(0, 1fr);
+        gap: 25px;
+        align-items: start;
+    }
+
+    .planner-card {
+        background: white;
+        border: 1px solid #e1e9e3;
+        border-radius: 18px;
+        padding: 26px;
+    }
+
+    .planner-card h2 {
+        color: #244b38;
+        font-size: 22px;
+        margin-bottom: 18px;
+    }
+
+    .planner-form {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+    }
+
+    .planner-form label {
+        color: #244b38;
+        font-weight: 600;
+        font-size: 14px;
+    }
+
+    .planner-input {
+        width: 100%;
+        padding: 13px 14px;
+        border: 1px solid #d5ded8;
+        border-radius: 9px;
+        background: white;
+        color: #334a3d;
+        font: inherit;
+        box-sizing: border-box;
+    }
+
+    .planner-input:focus {
+        outline: none;
+        border-color: #167d68;
+    }
+
+    .planner-form textarea {
+        min-height: 110px;
+        resize: vertical;
+    }
+
+    .planner-button {
+        padding: 13px 18px;
+        background: #244b38;
+        color: white;
+        border: none;
+        border-radius: 9px;
+        font: inherit;
+        font-weight: 700;
+        cursor: pointer;
+        margin-top: 8px;
+    }
+
+    .planner-button:hover {
+        background: #167d68;
+    }
+
+    .planner-button:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+    }
+
+    .planner-cancel {
+        background: #edf3ee;
+        color: #244b38;
+    }
+
+    .planner-cancel:hover {
+        background: #dce9df;
+    }
+
+    .planner-message {
+        font-size: 14px;
+        color: #24614b;
+        line-height: 1.6;
+    }
+
+    .planner-count {
+        color: #68786d;
+        font-size: 14px;
+        margin-bottom: 20px;
+    }
+
+    .planner-item {
+        border: 1px solid #e2eae4;
+        border-radius: 13px;
+        padding: 20px;
+        margin-bottom: 15px;
+    }
+
+    .planner-item h3 {
+        color: #244b38;
+        font-size: 20px;
+        margin-bottom: 8px;
+    }
+
+    .planner-item p {
+        color: #63756a;
+        line-height: 1.6;
+        margin-bottom: 9px;
+        overflow-wrap: anywhere;
+    }
+
+    .planner-item-date {
+        font-weight: 700;
+        color: #167d68 !important;
+    }
+
+    .planner-actions {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+        margin-top: 15px;
+    }
+
+    .planner-small-btn {
+        padding: 9px 14px;
+        border: 1px solid #cddcd1;
+        border-radius: 8px;
+        background: white;
+        color: #244b38;
+        font: inherit;
+        font-size: 13px;
+        font-weight: 600;
+        cursor: pointer;
+    }
+
+    .planner-small-btn:hover {
+        background: #f0f6f1;
+    }
+
+    .planner-delete {
+        color: #b42318;
+        border-color: #e8c7c3;
+    }
+
+    .planner-empty {
+        padding: 40px 20px;
+        text-align: center;
+        background: #f5f8f5;
+        border-radius: 13px;
+        color: #65766b;
+        line-height: 1.7;
+    }
+
+    .planner-empty a,
+    .planner-destination-link {
+        color: #167d68;
+        font-weight: 700;
+        text-decoration: none;
+    }
+
+    .planner-empty a:hover,
+    .planner-destination-link:hover {
+        text-decoration: underline;
+    }
+
+    /* BUTTON ADDED TO DESTINATION DETAIL PAGES */
+
+    .spot-itinerary-btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: 12px 18px;
+        border: 1.5px solid #244b38;
+        border-radius: 999px;
+        background: white;
+        color: #244b38;
+        font: inherit;
+        font-size: 14px;
+        font-weight: 700;
+        text-decoration: none;
+        cursor: pointer;
+    }
+
+    @media (max-width: 800px) {
+        .planner-layout {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    @media (max-width: 768px) {
+        .planner-page {
+            padding: 25px 15px 95px;
+        }
+
+        .planner-card {
+            padding: 22px;
+        }
+    }
+</style>
+
+<div class="planner-page" id="itinerary-planner">
+
+    <div class="planner-heading">
+        <h1>My Travel Planner</h1>
+
+        <p>
+            Organize your Palawan adventure.
+            Choose destinations, plan visit dates,
+            and save your travel notes.
+        </p>
+    </div>
+
+    <div class="planner-layout">
+
+        <!-- ADD OR EDIT PLAN -->
+
+        <section class="planner-card" id="planner-form-section">
+
+            <h2 id="planner-form-heading">
+                Add a Destination
+            </h2>
+
+            <form id="planner-form" class="planner-form">
+
+                <label for="planner-spot">
+                    Destination *
+                </label>
+
+                <select
+                    id="planner-spot"
+                    class="planner-input"
+                    required
+                >
+                    <option value="">
+                        Select a destination
+                    </option>
+
+                    {% for spot in spots %}
+                        <option value="{{ spot.pk }}">
+                            {{ spot.name }} — {{ spot.location.name }}
+                        </option>
+                    {% endfor %}
+                </select>
+
+                <label for="planner-date">
+                    Visit Date *
+                </label>
+
+                <input
+                    type="date"
+                    id="planner-date"
+                    class="planner-input"
+                    required
+                >
+
+                <label for="planner-notes">
+                    Travel Notes (Optional)
+                </label>
+
+                <textarea
+                    id="planner-notes"
+                    class="planner-input"
+                    maxlength="2000"
+                    placeholder="Things to do, places to visit, reminders..."
+                ></textarea>
+
+                <button
+                    type="submit"
+                    id="planner-save"
+                    class="planner-button"
+                >
+                    Save to Itinerary
+                </button>
+
+                <button
+                    type="button"
+                    id="planner-cancel"
+                    class="planner-button planner-cancel"
+                    hidden
+                >
+                    Cancel Editing
+                </button>
+
+                <p
+                    id="planner-message"
+                    class="planner-message"
+                    role="status"
+                    aria-live="polite"
+                ></p>
+
+            </form>
+        </section>
+
+        <!-- SAVED PLANS -->
+
+        <section class="planner-card">
+
+            <h2>My Planned Trips</h2>
+
+            <p
+                id="planner-count"
+                class="planner-count"
+            >
+                Loading your travel plans...
+            </p>
+
+            <div
+                id="planner-list"
+                aria-live="polite"
+            ></div>
+
+            <div
+                id="planner-empty"
+                class="planner-empty"
+                hidden
+            >
+                <p>
+                    No travel plans yet.
+                </p>
+
+                <p>
+                    <a href="{% url 'home' %}#destinations">
+                        Explore destinations
+                    </a>
+                    to start planning your trip.
+                </p>
+            </div>
+
+        </section>
+
+    </div>
+</div>
+
+{% endblock %}

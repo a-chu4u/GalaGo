@@ -2,8 +2,10 @@
 {% load static %}
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
+
     <meta
         name="viewport"
         content="width=device-width, initial-scale=1"
@@ -25,7 +27,7 @@
         .header .desktop-nav {
             display: flex;
             align-items: center;
-            gap: 32px;
+            gap: 24px;
         }
 
         .header-actions {
@@ -38,12 +40,21 @@
             white-space: nowrap;
         }
 
+        .mobile-nav a {
+            min-width: 0;
+        }
+
+        .mobile-nav small {
+            font-size: 10px;
+        }
+
         @media (max-width: 768px) {
             .header-actions {
                 display: none;
             }
         }
     </style>
+
 </head>
 
 <body>
@@ -56,6 +67,7 @@
         </a>
 
         <nav class="desktop-nav">
+
             <a href="{% url 'home' %}">
                 Explore
             </a>
@@ -65,12 +77,17 @@
             </a>
 
             <a href="{% url 'favorites' %}">
-                ♡ Favorites
+                Favorites
+            </a>
+
+            <a href="{% url 'itinerary' %}">
+                My Itinerary
             </a>
 
             <a href="{% url 'home' %}#about">
                 About
             </a>
+
         </nav>
 
         <div class="header-actions">
@@ -126,12 +143,19 @@
         <small>Favorites</small>
     </a>
 
+    <a href="{% url 'itinerary' %}">
+        <span>▦</span>
+        <small>Itinerary</small>
+    </a>
+
     <a href="{% url 'home' %}#about">
         <span>☷</span>
         <small>About</small>
     </a>
 
 </nav>
+
+<script src="{% static 'js/itinerary.js' %}" defer></script>
 
 </body>
 </html>

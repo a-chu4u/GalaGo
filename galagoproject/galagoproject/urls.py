@@ -9,6 +9,7 @@ from rest_framework.routers import DefaultRouter
 from tourism import views
 from tourism import api_views
 from tourism import admin_views
+from tourism import itinerary_views
 
 
 router = DefaultRouter()
@@ -65,6 +66,12 @@ urlpatterns = [
         "favorites/",
         views.home,
         name="favorites"
+    ),
+
+    path(
+        "itinerary/",
+        itinerary_views.itinerary_page,
+        name="itinerary"
     ),
 
     path(
