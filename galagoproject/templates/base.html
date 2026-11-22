@@ -6,10 +6,7 @@
 <head>
     <meta charset="UTF-8">
 
-    <meta
-        name="viewport"
-        content="width=device-width, initial-scale=1"
-    >
+    <meta name="viewport" content="width=device-width, initial-scale=1">
 
     <title>{% block title %}GalaGo{% endblock %}</title>
 
@@ -18,10 +15,7 @@
         rel="stylesheet"
     >
 
-    <link
-        rel="stylesheet"
-        href="{% static 'css/style.css' %}"
-    >
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
 
     <style>
         .header .desktop-nav {
@@ -34,18 +28,40 @@
             display: flex;
             align-items: center;
             justify-content: flex-end;
+            gap: 12px;
         }
 
         .header-actions .nav-button {
             white-space: nowrap;
         }
 
-        .mobile-nav a {
+        .auth-username {
+            font-weight: 600;
+        }
+
+        .auth-logout-form {
+            margin: 0;
+        }
+
+        .auth-logout-button {
+            cursor: pointer;
+            font: inherit;
+        }
+
+        .mobile-nav a,
+        .mobile-nav button {
             min-width: 0;
         }
 
         .mobile-nav small {
             font-size: 10px;
+        }
+
+        .mobile-nav button {
+            border: none;
+            background: transparent;
+            color: inherit;
+            cursor: pointer;
         }
 
         @media (max-width: 768px) {
@@ -54,7 +70,6 @@
             }
         }
     </style>
-
 </head>
 
 <body>
@@ -68,9 +83,7 @@
 
         <nav class="desktop-nav">
 
-            <a href="{% url 'home' %}">
-                Explore
-            </a>
+            <a href="{% url 'home' %}">Explore</a>
 
             <a href="{% url 'home' %}#destinations">
                 Destinations
@@ -91,12 +104,37 @@
         </nav>
 
         <div class="header-actions">
-            <a
-                href="{% url 'home' %}#destinations"
-                class="nav-button"
-            >
-                Explore Palawan ↗
-            </a>
+            {% if user.is_authenticated %}
+
+                <span class="auth-username">
+                    Hi, {{ user.username }}!
+                </span>
+
+                <form
+                    method="post"
+                    action="{% url 'logout' %}"
+                    class="auth-logout-form"
+                >
+                    {% csrf_token %}
+                    <button
+                        type="submit"
+                        class="nav-button auth-logout-button"
+                    >
+                        Logout
+                    </button>
+                </form>
+
+            {% else %}
+
+                <a href="{% url 'login' %}">
+                    Login
+                </a>
+
+                <a href="{% url 'register' %}" class="nav-button">
+                    Sign Up
+                </a>
+
+            {% endif %}
         </div>
 
     </div>
@@ -148,14 +186,27 @@
         <small>Itinerary</small>
     </a>
 
-    <a href="{% url 'home' %}#about">
-        <span>☷</span>
-        <small>About</small>
-    </a>
+    {% if user.is_authenticated %}
+
+        <form method="post" action="{% url 'logout' %}">
+            {% csrf_token %}
+            <button type="submit">
+                <span>⇥</span>
+                <small>Logout</small>
+            </button>
+        </form>
+
+    {% else %}
+
+        <a href="{% url 'login' %}">
+            <span>♙</span>
+            <small>Login</small>
+        </a>
+
+    {% endif %}
 
 </nav>
 
-<script src="{% static 'js/itinerary.js' %}" defer></script>
-
+<script src="{% static 'js/itinerary.js' %}?v=2" defer></script>
 </body>
 </html>

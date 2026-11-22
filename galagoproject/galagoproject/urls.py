@@ -1,5 +1,6 @@
 
 from django.contrib import admin
+from django.contrib.auth.decorators import login_required
 from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
@@ -10,61 +11,28 @@ from tourism import views
 from tourism import api_views
 from tourism import admin_views
 from tourism import itinerary_views
+from tourism import auth_views
 
 
 router = DefaultRouter()
 
-router.register(
-    r"categories",
-    api_views.CategoryViewSet
-)
-
-router.register(
-    r"locations",
-    api_views.LocationViewSet
-)
-
-router.register(
-    r"spots",
-    api_views.TouristSpotViewSet
-)
-
-router.register(
-    r"visitors",
-    api_views.VisitorViewSet
-)
-
-router.register(
-    r"reviews",
-    api_views.ReviewViewSet
-)
-
-router.register(
-    r"favorites",
-    api_views.FavoriteViewSet
-)
-
-router.register(
-    r"itineraries",
-    api_views.ItineraryViewSet
-)
+router.register("categories", api_views.CategoryViewSet)
+router.register("locations", api_views.LocationViewSet)
+router.register("spots", api_views.TouristSpotViewSet)
+router.register("visitors", api_views.VisitorViewSet)
+router.register("reviews", api_views.ReviewViewSet)
+router.register("favorites", api_views.FavoriteViewSet)
+router.register("itineraries", api_views.ItineraryViewSet)
 
 
 urlpatterns = [
-    path(
-        "admin/",
-        admin.site.urls
-    ),
+    path("admin/", admin.site.urls),
 
-    path(
-        "",
-        views.home,
-        name="home"
-    ),
+    path("", views.home, name="home"),
 
     path(
         "favorites/",
-        views.home,
+        login_required(views.home, login_url="login"),
         name="favorites"
     ),
 
@@ -72,6 +40,18 @@ urlpatterns = [
         "itinerary/",
         itinerary_views.itinerary_page,
         name="itinerary"
+    ),
+
+    path(
+        "itinerary/data/",
+        itinerary_views.itinerary_api,
+        name="itinerary_api"
+    ),
+
+    path(
+        "itinerary/data/<int:pk>/",
+        itinerary_views.itinerary_item_api,
+        name="itinerary_item_api"
     ),
 
     path(
@@ -84,6 +64,24 @@ urlpatterns = [
         "spots/<int:pk>/route/",
         views.calculate_route,
         name="calculate_route"
+    ),
+
+    path(
+        "register/",
+        auth_views.register_view,
+        name="register"
+    ),
+
+    path(
+        "login/",
+        auth_views.login_view,
+        name="login"
+    ),
+
+    path(
+        "logout/",
+        auth_views.logout_view,
+        name="logout"
     ),
 
     path(
@@ -104,15 +102,8 @@ urlpatterns = [
         name="admin_logout"
     ),
 
-    path(
-        "api/",
-        include(router.urls)
-    ),
-
-    path(
-        "api-auth/",
-        include("rest_framework.urls")
-    ),
+    path("api/", include(router.urls)),
+    path("api-auth/", include("rest_framework.urls")),
 ]
 
 

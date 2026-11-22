@@ -1,162 +1,71 @@
 
 document.addEventListener("DOMContentLoaded", function () {
 
-    const STORAGE_KEY = "galago_itinerary";
-
-    function getPlans() {
-        try {
-            const raw = localStorage.getItem(STORAGE_KEY);
-            const parsed = raw ? JSON.parse(raw) : [];
-
-            if (!Array.isArray(parsed)) {
-                return [];
-            }
-
-            return parsed.filter(function (plan) {
-                return (
-                    plan &&
-                    typeof plan === "object" &&
-                    typeof plan.spotId === "string" &&
-                    typeof plan.visitDate === "string" &&
-                    typeof plan.id === "string"
-                );
-            });
-
-        } catch (error) {
-            return [];
-        }
-    }
-
-    function savePlans(plans) {
-        try {
-            localStorage.setItem(
-                STORAGE_KEY,
-                JSON.stringify(plans)
-            );
-            return true;
-        } catch (error) {
-            return false;
-        }
-    }
-
-    function createId() {
-        if (
-            typeof crypto !== "undefined" &&
-            typeof crypto.randomUUID === "function"
-        ) {
-            return crypto.randomUUID();
-        }
-
-        return (
-            Date.now().toString(36) +
-            "-" +
-            Math.random().toString(36).slice(2)
-        );
-    }
-
-    function formatDate(dateString) {
-        const parts = dateString.split("-");
-
-        if (parts.length !== 3) {
-            return dateString;
-        }
-
-        const year = Number(parts[0]);
-        const month = Number(parts[1]);
-        const day = Number(parts[2]);
-
-        const date = new Date(year, month - 1, day);
-
-        if (
-            date.getFullYear() !== year ||
-            date.getMonth() !== month - 1 ||
-            date.getDate() !== day
-        ) {
-            return dateString;
-        }
-
-        return date.toLocaleDateString("en-US", {
-            year: "numeric",
-            month: "long",
-            day: "numeric"
-        });
-    }
-
-    // ADD BUTTON TO TOURIST SPOT DETAIL PAGE
-
     function setupSpotDetailButton() {
         const match = window.location.pathname.match(
             /^\/spots\/(\d+)\/$/
         );
 
-        if (!match) {
-            return;
-        }
+        if (!match) return;
 
         const title = document.querySelector(".spot-title");
-
-        if (!title) {
-            return;
-        }
-
-        const spotId = match[1];
+        if (!title) return;
 
         const button = document.createElement("a");
 
-        button.href =
-            "/itinerary/?spot=" + encodeURIComponent(spotId);
+        button.href = "/itinerary/?spot=" +
+            encodeURIComponent(match[1]);
 
         button.className = "spot-itinerary-btn";
-
         button.textContent = "＋ Add to Itinerary";
 
-        button.style.display = "inline-flex";
-        button.style.alignItems = "center";
-        button.style.justifyContent = "center";
-        button.style.padding = "12px 18px";
-        button.style.border = "1.5px solid #244b38";
-        button.style.borderRadius = "999px";
-        button.style.background = "#ffffff";
-        button.style.color = "#244b38";
-        button.style.fontSize = "14px";
-        button.style.fontWeight = "700";
-        button.style.textDecoration = "none";
+        Object.assign(button.style, {
+            display: "inline-flex",
+            alignItems: "center",
+            justifyContent: "center",
+            padding: "12px 18px",
+            border: "1.5px solid #244b38",
+            borderRadius: "999px",
+            background: "#ffffff",
+            color: "#244b38",
+            fontSize: "14px",
+            fontWeight: "700",
+            textDecoration: "none"
+        });
 
-        const titleRow = document.querySelector(
-            ".spot-title-row"
-        );
+        const row = document.querySelector(".spot-title-row");
 
-        if (titleRow) {
-            titleRow.appendChild(button);
+        if (row) {
+            row.appendChild(button);
         } else {
-            title.insertAdjacentElement(
-                "afterend",
-                button
-            );
+            title.insertAdjacentElement("afterend", button);
             button.style.marginBottom = "16px";
         }
     }
 
     setupSpotDetailButton();
 
-    // TRAVEL PLANNER PAGE
-
     const planner = document.getElementById(
         "itinerary-planner"
     );
 
-    if (!planner) {
-        return;
-    }
+    if (!planner) return;
+
+    const API_URL = planner.dataset.apiUrl || "/itinerary/data/";
 
     const form = document.getElementById("planner-form");
     const spotSelect = document.getElementById("planner-spot");
     const dateInput = document.getElementById("planner-date");
+    const timeInput = document.getElementById("planner-time");
+    const durationInput = document.getElementById("planner-duration");
+    const costInput = document.getElementById("planner-cost");
     const notesInput = document.getElementById("planner-notes");
 
     const list = document.getElementById("planner-list");
     const empty = document.getElementById("planner-empty");
     const count = document.getElementById("planner-count");
+    const daysCount = document.getElementById("planner-days");
+    const budgetTotal = document.getElementById("planner-budget");
 
     const message = document.getElementById("planner-message");
     const saveButton = document.getElementById("planner-save");
@@ -165,30 +74,151 @@ document.addEventListener("DOMContentLoaded", function () {
         "planner-form-heading"
     );
 
+    let plans = [];
     let editingId = null;
 
-    function getSpotName(spotId) {
-        const option = Array.from(spotSelect.options).find(
-            function (item) {
-                return item.value === spotId;
+    function getCookie(name) {
+        for (const cookie of document.cookie.split(";")) {
+            const trimmed = cookie.trim();
+
+            if (trimmed.startsWith(name + "=")) {
+                return decodeURIComponent(
+                    trimmed.slice(name.length + 1)
+                );
             }
+        }
+
+        return "";
+    }
+
+    async function apiRequest(url, options = {}) {
+        const method = options.method || "GET";
+
+        const response = await fetch(url, {
+            ...options,
+            method,
+            credentials: "same-origin",
+            headers: {
+                Accept: "application/json",
+
+                ...(method !== "GET" ? {
+                    "Content-Type": "application/json",
+                    "X-CSRFToken": getCookie("csrftoken")
+                } : {}),
+
+                ...(options.headers || {})
+            }
+        });
+
+        if (response.redirected) {
+            throw new Error(
+                "Your session expired. Please log in again."
+            );
+        }
+
+        const type = response.headers.get(
+            "content-type"
+        ) || "";
+
+        if (!type.includes("application/json")) {
+            throw new Error("Unexpected server response.");
+        }
+
+        const data = await response.json();
+
+        if (!response.ok) {
+            throw new Error(
+                data.error || "Unable to complete request."
+            );
+        }
+
+        return data;
+    }
+
+    function textElement(tag, className, value) {
+        const el = document.createElement(tag);
+
+        if (className) {
+            el.className = className;
+        }
+
+        el.textContent = value;
+        return el;
+    }
+
+    function money(value) {
+        return "₱" + Number(value || 0).toLocaleString(
+            "en-PH",
+            {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2
+            }
+        );
+    }
+
+    function dateLabel(value) {
+        const [y, m, d] = value.split("-").map(Number);
+
+        return new Date(
+            y,
+            m - 1,
+            d
+        ).toLocaleDateString("en-US", {
+            year: "numeric",
+            month: "long",
+            day: "numeric"
+        });
+    }
+
+    function timeLabel(value) {
+        if (!value) return "";
+
+        const [hours, minutes] = value.split(":").map(Number);
+
+        const hour12 = hours % 12 || 12;
+
+        return hour12 + ":" +
+            String(minutes).padStart(2, "0") +
+            (hours >= 12 ? " PM" : " AM");
+    }
+
+    function durationLabel(value) {
+        if (value === "" || value == null) return "";
+
+        const hours = Number(value);
+        const totalMinutes = Math.round(hours * 60);
+        const wholeHours = Math.floor(totalMinutes / 60);
+        const remainingMinutes = totalMinutes % 60;
+
+        const parts = [];
+
+        if (wholeHours) {
+            parts.push(
+                wholeHours + (
+                    wholeHours === 1 ? " hour" : " hours"
+                )
+            );
+        }
+
+        if (remainingMinutes) {
+            parts.push(
+                remainingMinutes + " min"
+            );
+        }
+
+        return parts.join(" ") || "0 min";
+    }
+
+    function spotName(id) {
+        const option = Array.from(
+            spotSelect.options
+        ).find(
+            o => o.value === String(id)
         );
 
         return option
             ? option.textContent.trim()
-            : "Destination no longer available";
-    }
-
-    function makeTextElement(tag, className, content) {
-        const element = document.createElement(tag);
-
-        if (className) {
-            element.className = className;
-        }
-
-        element.textContent = content;
-
-        return element;
+            : "Destination unavailable";
     }
 
     function resetForm() {
@@ -201,113 +231,233 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     function renderPlans() {
-        const plans = getPlans().sort(function (a, b) {
-            return a.visitDate.localeCompare(b.visitDate);
-        });
+        const sorted = [...plans].sort(
+            (a, b) =>
+                a.visitDate.localeCompare(b.visitDate) ||
+                (a.visitTime || "99:99").localeCompare(
+                    b.visitTime || "99:99"
+                ) ||
+                Number(a.id) - Number(b.id)
+        );
 
         list.replaceChildren();
 
-        count.textContent =
-            plans.length +
-            (plans.length === 1
-                ? " planned visit"
-                : " planned visits");
-
-        empty.hidden = plans.length !== 0;
-
-        plans.forEach(function (plan) {
-            const card = document.createElement("article");
-            card.className = "planner-item";
-
-            const name = makeTextElement(
-                "h3",
-                "",
-                getSpotName(plan.spotId)
+        count.textContent = sorted.length +
+            (
+                sorted.length === 1
+                    ? " planned visit"
+                    : " planned visits"
             );
 
-            const date = makeTextElement(
-                "p",
-                "planner-item-date",
-                "📅 " + formatDate(plan.visitDate)
+        empty.hidden = sorted.length !== 0;
+
+        const groups = new Map();
+
+        for (const plan of sorted) {
+            if (!groups.has(plan.visitDate)) {
+                groups.set(plan.visitDate, []);
+            }
+
+            groups.get(plan.visitDate).push(plan);
+        }
+
+        daysCount.textContent = String(groups.size);
+
+        const totalCents = sorted.reduce(
+            (sum, p) =>
+                sum + Math.round(
+                    Number(p.estimatedCost || 0) * 100
+                ),
+            0
+        );
+
+        budgetTotal.textContent = money(totalCents / 100);
+
+        let dayIndex = 0;
+
+        for (const [day, dayPlans] of groups) {
+            dayIndex++;
+
+            const section = textElement(
+                "section",
+                "planner-day",
+                ""
             );
 
-            card.appendChild(name);
-            card.appendChild(date);
+            const heading = textElement(
+                "div",
+                "planner-day-heading",
+                ""
+            );
 
-            if (plan.notes) {
-                const notes = makeTextElement(
-                    "p",
+            heading.appendChild(
+                textElement(
+                    "h3",
                     "",
-                    plan.notes
+                    "Day " + dayIndex +
+                    " — " + dateLabel(day)
+                )
+            );
+
+            const dayCents = dayPlans.reduce(
+                (sum, p) =>
+                    sum + Math.round(
+                        Number(p.estimatedCost || 0) * 100
+                    ),
+                0
+            );
+
+            heading.appendChild(
+                textElement(
+                    "span",
+                    "",
+                    "Day budget: " + money(dayCents / 100)
+                )
+            );
+
+            section.appendChild(heading);
+
+            for (const plan of dayPlans) {
+                const card = textElement(
+                    "article",
+                    "planner-item",
+                    ""
                 );
 
-                notes.style.whiteSpace = "pre-line";
-                card.appendChild(notes);
-            }
+                card.appendChild(
+                    textElement(
+                        "h4",
+                        "",
+                        spotName(plan.spotId)
+                    )
+                );
 
-            const actions = document.createElement("div");
-            actions.className = "planner-actions";
+                const meta = textElement(
+                    "div",
+                    "planner-meta",
+                    ""
+                );
 
-            if (
-                Array.from(spotSelect.options).some(
-                    function (option) {
-                        return option.value === plan.spotId;
-                    }
-                )
-            ) {
-                const viewLink = document.createElement("a");
+                if (plan.visitTime) {
+                    meta.appendChild(
+                        textElement(
+                            "span",
+                            "planner-pill",
+                            "🕒 " + timeLabel(plan.visitTime)
+                        )
+                    );
+                }
 
-                viewLink.href = "/spots/" +
+                if (
+                    plan.durationHours !== "" &&
+                    plan.durationHours != null
+                ) {
+                    meta.appendChild(
+                        textElement(
+                            "span",
+                            "planner-pill",
+                            "⏳ " + durationLabel(
+                                plan.durationHours
+                            )
+                        )
+                    );
+                }
+
+                if (
+                    plan.estimatedCost !== "" &&
+                    plan.estimatedCost != null
+                ) {
+                    meta.appendChild(
+                        textElement(
+                            "span",
+                            "planner-pill",
+                            "💰 " + money(plan.estimatedCost)
+                        )
+                    );
+                }
+
+                card.appendChild(meta);
+
+                if (plan.notes) {
+                    const notes = textElement(
+                        "p",
+                        "",
+                        plan.notes
+                    );
+
+                    notes.style.whiteSpace = "pre-line";
+                    card.appendChild(notes);
+                }
+
+                const actions = textElement(
+                    "div",
+                    "planner-actions",
+                    ""
+                );
+
+                const link = textElement(
+                    "a",
+                    "planner-small-btn",
+                    "View Destination"
+                );
+
+                link.href = "/spots/" +
                     encodeURIComponent(plan.spotId) + "/";
 
-                viewLink.textContent = "View Destination";
-                viewLink.className = "planner-small-btn";
-                viewLink.style.textDecoration = "none";
+                actions.appendChild(link);
 
-                actions.appendChild(viewLink);
+                const edit = textElement(
+                    "button",
+                    "planner-small-btn",
+                    "Edit"
+                );
+
+                edit.type = "button";
+
+                edit.addEventListener(
+                    "click",
+                    () => startEditing(plan.id)
+                );
+
+                actions.appendChild(edit);
+
+                const remove = textElement(
+                    "button",
+                    "planner-small-btn planner-delete",
+                    "Delete"
+                );
+
+                remove.type = "button";
+
+                remove.addEventListener(
+                    "click",
+                    () => deletePlan(plan.id)
+                );
+
+                actions.appendChild(remove);
+
+                card.appendChild(actions);
+                section.appendChild(card);
             }
 
-            const editButton = document.createElement("button");
-            editButton.type = "button";
-            editButton.className = "planner-small-btn";
-            editButton.textContent = "Edit";
-
-            editButton.addEventListener("click", function () {
-                startEditing(plan.id);
-            });
-
-            actions.appendChild(editButton);
-
-            const deleteButton = document.createElement("button");
-            deleteButton.type = "button";
-            deleteButton.className =
-                "planner-small-btn planner-delete";
-            deleteButton.textContent = "Delete";
-
-            deleteButton.addEventListener("click", function () {
-                deletePlan(plan.id);
-            });
-
-            actions.appendChild(deleteButton);
-
-            card.appendChild(actions);
-            list.appendChild(card);
-        });
+            list.appendChild(section);
+        }
     }
 
-    function startEditing(planId) {
-        const plan = getPlans().find(function (item) {
-            return item.id === planId;
-        });
+    function startEditing(id) {
+        const plan = plans.find(
+            p => p.id === String(id)
+        );
 
-        if (!plan) {
-            return;
-        }
+        if (!plan) return;
 
         editingId = plan.id;
 
         spotSelect.value = plan.spotId;
         dateInput.value = plan.visitDate;
+        timeInput.value = plan.visitTime || "";
+        durationInput.value = plan.durationHours ?? "";
+        costInput.value = plan.estimatedCost ?? "";
         notesInput.value = plan.notes || "";
 
         formHeading.textContent = "Edit Travel Plan";
@@ -324,127 +474,117 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     }
 
-    function deletePlan(planId) {
-        const confirmed = window.confirm(
-            "Remove this destination from your itinerary?"
-        );
+    async function loadPlans() {
+        try {
+            const data = await apiRequest(API_URL);
 
-        if (!confirmed) {
-            return;
+            plans = data.plans;
+            renderPlans();
+
+            return true;
+        } catch (error) {
+            count.textContent =
+                "Unable to load travel plans.";
+
+            message.textContent = error.message;
+            return false;
         }
-
-        const updated = getPlans().filter(function (plan) {
-            return plan.id !== planId;
-        });
-
-        if (!savePlans(updated)) {
-            message.textContent =
-                "Unable to update itinerary in this browser.";
-            return;
-        }
-
-        if (editingId === planId) {
-            resetForm();
-        }
-
-        message.textContent =
-            "Travel plan removed successfully.";
-
-        renderPlans();
     }
 
-    form.addEventListener("submit", function (event) {
-        event.preventDefault();
-
-        const spotId = spotSelect.value;
-        const visitDate = dateInput.value;
-        const notes = notesInput.value.trim();
-
-        if (!spotId || !visitDate) {
-            message.textContent =
-                "Please select a destination and visit date.";
+    async function deletePlan(id) {
+        if (!window.confirm(
+            "Remove this destination from your itinerary?"
+        )) {
             return;
         }
 
-        const plans = getPlans();
+        try {
+            await apiRequest(
+                API_URL + encodeURIComponent(id) + "/",
+                { method: "DELETE" }
+            );
 
-        if (editingId) {
-            const index = plans.findIndex(function (plan) {
-                return plan.id === editingId;
-            });
-
-            if (index === -1) {
-                message.textContent =
-                    "This travel plan no longer exists.";
+            if (editingId === id) {
                 resetForm();
-                renderPlans();
-                return;
             }
 
-            plans[index] = {
-                ...plans[index],
-                spotId: spotId,
-                visitDate: visitDate,
-                notes: notes
-            };
-
-        } else {
-            plans.push({
-                id: createId(),
-                spotId: spotId,
-                visitDate: visitDate,
-                notes: notes
-            });
-        }
-
-        if (!savePlans(plans)) {
-            message.textContent =
-                "Unable to save itinerary in this browser.";
-            return;
-        }
-
-        const wasEditing = editingId !== null;
-
-        resetForm();
-        renderPlans();
-
-        message.textContent = wasEditing
-            ? "Travel plan updated successfully!"
-            : "Destination added to your itinerary!";
-    });
-
-    cancelButton.addEventListener("click", function () {
-        resetForm();
-        message.textContent = "";
-    });
-
-    // PRESELECT SPOT FROM DESTINATION DETAIL PAGE
-
-    const params = new URLSearchParams(
-        window.location.search
-    );
-
-    const requestedSpot = params.get("spot");
-
-    if (requestedSpot) {
-        const available = Array.from(
-            spotSelect.options
-        ).some(function (option) {
-            return option.value === requestedSpot;
-        });
-
-        if (available) {
-            spotSelect.value = requestedSpot;
+            if (await loadPlans()) {
+                message.textContent =
+                    "Travel plan removed successfully.";
+            }
+        } catch (error) {
+            message.textContent = error.message;
         }
     }
 
-    // REFRESH IF ANOTHER TAB CHANGES ITINERARY
+    form.addEventListener(
+        "submit",
+        async function (event) {
+            event.preventDefault();
 
-    window.addEventListener("storage", function (event) {
-        if (event.key === STORAGE_KEY) {
-            renderPlans();
+            if (!form.reportValidity()) return;
+
+            const wasEditing = editingId !== null;
+
+            const url = wasEditing
+                ? API_URL +
+                  encodeURIComponent(editingId) + "/"
+                : API_URL;
+
+            saveButton.disabled = true;
+
+            message.textContent =
+                "Saving your travel plan...";
+
+            try {
+                await apiRequest(url, {
+                    method: wasEditing ? "PUT" : "POST",
+
+                    body: JSON.stringify({
+                        spotId: spotSelect.value,
+                        visitDate: dateInput.value,
+                        visitTime: timeInput.value,
+                        durationHours: durationInput.value,
+                        estimatedCost: costInput.value,
+                        notes: notesInput.value.trim()
+                    })
+                });
+
+                resetForm();
+
+                if (await loadPlans()) {
+                    message.textContent = wasEditing
+                        ? "Travel plan updated successfully!"
+                        : "Destination added to your itinerary!";
+                }
+            } catch (error) {
+                message.textContent = error.message;
+            } finally {
+                saveButton.disabled = false;
+            }
         }
-    });
+    );
 
-    renderPlans();
+    cancelButton.addEventListener(
+        "click",
+        function () {
+            resetForm();
+            message.textContent = "";
+        }
+    );
+
+    const requestedSpot = new URLSearchParams(
+        window.location.search
+    ).get("spot");
+
+    if (
+        requestedSpot &&
+        Array.from(spotSelect.options).some(
+            o => o.value === requestedSpot
+        )
+    ) {
+        spotSelect.value = requestedSpot;
+    }
+
+    loadPlans();
 });
