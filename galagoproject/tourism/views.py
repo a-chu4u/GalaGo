@@ -221,6 +221,8 @@ def spot_detail(request, pk):
             "weather": weather,
             "review_form": form,
             "review_submitted": review_submitted,
+            "maptiler_api_key": os.environ.get("MAPTILER_API_KEY", ""),
+
         }
     )
 

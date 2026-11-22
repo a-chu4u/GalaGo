@@ -70,13 +70,8 @@ GalaGo also includes an administrative dashboard for managing tourist destinatio
 
 ## 🔗 Live Website
 
-> 🚧 **Deployment in Progress**
 
-GalaGo is being prepared for online deployment through PythonAnywhere.
-
-**Website:** `https://YOUR-USERNAME.pythonanywhere.com/`
-
-The link will be updated once deployment is complete.
+**Website:** `https://galago.pythonanywhere.com/`
 
 ---
 
@@ -99,11 +94,13 @@ Developed by the GalaGo team.
 
 | Developer | GitHub |
 |:---|:---|
-| **Developer 1** | [@username1](https://github.com/username1) |
-| **Developer 2** | [@username2](https://github.com/username2) |
-| **Developer 3** | [@username3](https://github.com/username3) |
+| **Developer 1** | [a-chu4u](https://github.com/a-chu4u) |
+| **Developer 2** | [nyxxbyte](https://github.com/nyxxbyte) |
+| **Developer 3** | [Krakenxz-12](https://github.com/Krakenxz-12) |
+| **Developer 4** | [lalaaivy](https://github.com/lalaaivy) |
+| **Developer 5** | [isobelsab](https://github.com/zumarragasabine) |
 
-*Replace the placeholders with the developers' actual names and GitHub profiles.*
+
 
 ---
 

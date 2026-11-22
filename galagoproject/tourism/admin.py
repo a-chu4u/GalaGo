@@ -15,12 +15,14 @@ from .models import (
 @admin.register(Category)
 class CategoryAdmin(admin.ModelAdmin):
     list_display = ("id", "name")
+    list_display_links = ("name",)
     search_fields = ("name",)
 
 
 @admin.register(Location)
 class LocationAdmin(admin.ModelAdmin):
     list_display = ("id", "name", "address", "latitude", "longitude")
+    list_display_links = ("name",)
     search_fields = ("name", "address")
 
 
